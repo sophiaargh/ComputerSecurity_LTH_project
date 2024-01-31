@@ -22,5 +22,4 @@ Vilken är den tvåställiga landskoden?
 
 keytool -certreq -keyalg RSA -file csr.csr -keystore clientkeystore
 
-openssl x509 -req -in your_csr.csr -CA your_ca_certificate.pem -CAkey your_ca_private_key.pem -CAcreateserial -out signed_certificate.crt -days 365
-
+openssl x509 -req -in csr.csr -CA ca.crt -CAkey ca_private.key -CAcreateserial -out signed_certificate.crt -days 365

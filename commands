@@ -24,5 +24,6 @@ keytool -certreq -keyalg RSA -file csr.csr -keystore clientkeystore
 
 openssl x509 -req -in csr.csr -CA ca.crt -CAkey ca_private.key -CAcreateserial -out signed_certificate.crt -days 365
 
-keytool -import -trustcacerts -alias your_ca_alias -file your_ca_certificate.pem -keystore your_keystore.jks
-keytool -import -trustcacerts -alias your_alias -file signed_certificate.crt -keystore your_keystore.jks
+keytool -import -trustcacerts -alias first_ca  -file ca.crt -keystore clientkeystore
+keytool -import -trustcacerts -alias signed_ca -file signed_certificate.crt -keystore clientkeystore
+

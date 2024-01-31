@@ -20,4 +20,4 @@ Vilken är den tvåställiga landskoden?
 Är CN=Lukas Kuhlin (lu4686ku-s)/Sophia Kovalenko (so4816ko-s)/Nils Sjögren (ni3302sj-s)/Nils Olsson (ni0723ol-s) korrekt?
   [nej]:  ja
 
-keytool -certreq -keyalg RSA -alias your_alias -file your_csr.csr -keystore your_keystore.jks
+keytool -certreq -keyalg RSA -file csr.csr -keystore clientkeystore

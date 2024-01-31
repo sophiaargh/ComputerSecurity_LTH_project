@@ -1,0 +1,32 @@
+if adding -storepass password, no need to enter the password everytime
+1. openssl genpkey -algorithm RSA -out ca.key
+openssl req -new -x509 -key ca.key -out ca.crt -subj "/CN=CA"
+openssl rsa -in ca.key -out ca_private.key
+
+2. keytool -import -file ca.crt -keystore clienttruststore (add the alias here -alias myca)
+3. keytool -keystore clientkeystore -genkey -keyalg RSA (add alias -alias mykey)
+Enter the distinguished name. Provide a single dot (.) to leave a sub-component empty or press ENTER to use the default value in braces.
+Vad heter du i för- och efternamn?
+  [Unknown]:  Lukas Kuhlin (lu4686ku-s)/Sophia Kovalenko (so4816ko-s)/Nils Sjögren (ni3302sj-s)/Nils Olsson (ni0723ol-s)
+Vad heter din avdelning inom organisationen?
+  [Unknown]:  .
+Vad heter din organisation?
+  [Unknown]:  .
+Vad heter din ort eller plats?
+  [Unknown]:  .
+Vad heter ditt land eller din provins?
+  [Unknown]:  .
+Vilken är den tvåställiga landskoden?
+  [Unknown]:  .
+Är CN=Lukas Kuhlin (lu4686ku-s)/Sophia Kovalenko (so4816ko-s)/Nils Sjögren (ni3302sj-s)/Nils Olsson (ni0723ol-s) korrekt?
+  [nej]:  ja
+
+4. keytool -certreq -keyalg RSA -file csr.csr -keystore clientkeystore (add alias -alias mykey)
+
+5. openssl x509 -req -in csr.csr -CA ca.crt -CAkey ca_private.key -CAcreateserial -out signed_certificate.crt -days 365
+
+6. keytool -import -trustcacerts -alias first_ca  -file ca.crt -keystore clientkeystore (add alias -alias ca)
+keytool -import -trustcacerts -alias signed_ca -file signed_certificate.crt -keystore clientkeystore (add -alias mykey)
+
+7. keytool -list -v -keystore clientkeystore 
+

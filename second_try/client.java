@@ -1,9 +1,11 @@
+import java.math.BigInteger;
 import java.net.*;
 import java.io.*;
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
 import java.security.KeyStore;
 import java.security.cert.*;
+import java.sql.SQLOutput;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -67,7 +69,11 @@ public class client {
       SSLSession session = socket.getSession();
       Certificate[] cert = session.getPeerCertificates();
       String subject = ((X509Certificate) cert[0]).getSubjectX500Principal().getName();
+      String issuer = ((X509Certificate) cert[0]).getIssuerX500Principal().getName();
+      BigInteger serialNumber = ((X509Certificate) cert[0]).getSerialNumber();
       System.out.println("certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
+      System.out.println("issuer:\n" + issuer + "\n");
+      System.out.println("serial number " + serialNumber);
       System.out.println("socket after handshake:\n" + socket + "\n");
       System.out.println("secure connection established\n\n");
 

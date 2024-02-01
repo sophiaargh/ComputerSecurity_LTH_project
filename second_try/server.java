@@ -1,4 +1,5 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.net.*;
 import javax.net.*;
 import javax.net.ssl.*;
@@ -22,9 +23,13 @@ public class server implements Runnable {
       SSLSession session = socket.getSession();
       Certificate[] cert = session.getPeerCertificates();
       String subject = ((X509Certificate) cert[0]).getSubjectX500Principal().getName();
+      String issuer = ((X509Certificate) cert[0]).getIssuerX500Principal().getName();
+      BigInteger serialNumber = ((X509Certificate) cert[0]).getSerialNumber();
       numConnectedClients++;
       System.out.println("client connected");
       System.out.println("client name (cert subject DN field): " + subject);
+      System.out.println("issuer:\n" + issuer + "\n");
+      System.out.println("serial number " + serialNumber);
       System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
       PrintWriter out = null;

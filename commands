@@ -30,3 +30,13 @@ keytool -import -trustcacerts -alias signed_ca -file signed_certificate.crt -key
 
 7. keytool -list -v -keystore clientkeystore 
 
+9. 
+keytool -keystore serverkeystore -genkey -keyalg RSA -alias serverkey (put name MyServer)
+keytool -certreq -keyalg RSA -file csr.csr -keystore serverkeystore -alias serverkey
+openssl x509 -req -in csr.csr -CA ca.crt -CAkey ca_private.key -CAcreateserial -out signed_certificate.crt -days 365
+keytool -import -trustcacerts -alias server_ca  -file ca.crt -keystore serverkeystore
+keytool -import -trustcacerts -alias serverkey -file signed_certificate.crt -keystore serverkeystore
+keytool -list -v -keystore serverkeystore
+
+10. keytool -import -file ca.crt -keystore servertruststore -alias server_ca
+

@@ -3,10 +3,9 @@ import util.MedicalRecord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Patient extends User{
-
-    private List<Permissions.perm> perms; 
 
     private List<MedicalRecord> medicalRecords;
     public Patient(String name, int id, Division division){

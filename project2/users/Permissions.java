@@ -2,7 +2,7 @@ package users;
 
 public class Permissions {
     enum perm{
-        READ, WRITE, EXECUTE, DELETE;
+        READ, WRITE, CREATE, DELETE;
     }
     
 }

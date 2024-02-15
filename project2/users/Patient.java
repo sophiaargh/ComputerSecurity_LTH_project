@@ -8,6 +8,7 @@ import java.util.Set;
 public class Patient extends User{
 
     private List<MedicalRecord> medicalRecords;
+    private Set<Permissions.perm> perms;
     public Patient(String name, int id, Division division){
         super(name, id, division);
         this.medicalRecords = new ArrayList<>();

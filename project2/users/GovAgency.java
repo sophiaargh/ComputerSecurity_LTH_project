@@ -1,16 +1,19 @@
 package users;
 
-import java.util.List;
+import util.MedicalRecord;
 
 public class GovAgency extends User {
-
-   
 
     public GovAgency (String name, int id, Division division){
         super(name, id, division);
 
-        perms.add(Permissions.perm.READ);
-        perms.add(Permissions.perm.DELETE);
+        perms.add(Permissions.READ);
+        perms.add(Permissions.DELETE);
+    }
+
+    public void deleteRecord(MedicalRecord medRec){
+
+        medRec = null;
     }
 
 }

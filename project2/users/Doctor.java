@@ -1,10 +1,9 @@
 package users;
 
 import java.util.List;
+import java.util.Set;
 
 public class Doctor extends User {
-
-    private List<Permissions.perm> perms;
 
     public Doctor (String name, int id, Division division){
         super(name, id, division);

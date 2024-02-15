@@ -4,7 +4,7 @@ import java.util.List;
 
 public class GovAgency extends User {
 
-    private List<Permissions.perm> perms;
+   
 
     public GovAgency (String name, int id, Division division){
         super(name, id, division);

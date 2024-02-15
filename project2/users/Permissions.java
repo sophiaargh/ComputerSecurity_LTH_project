@@ -1,8 +1,7 @@
 package users;
 
-public class Permissions {
-    enum perm{
+public enum Permissions {
         READ, WRITE, CREATE, DELETE;
     }
     
-}
+

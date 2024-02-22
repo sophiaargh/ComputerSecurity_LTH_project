@@ -67,6 +67,8 @@ public class server implements Runnable {
     int port = -1;
     if (args.length >= 1) {
       port = Integer.parseInt(args[0]);
+    } else {
+      port = 9876;
     }
     String type = "TLSv1.2";
     try {

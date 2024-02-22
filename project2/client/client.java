@@ -22,7 +22,7 @@ public class client {
     int port = -1;
     for (int i = 0; i < args.length; i++) {
       System.out.println("args[" + i + "] = " + args[i]);
-    }
+    }/*
     if (args.length < 2) {
       System.out.println("USAGE: java client host port");
       System.exit(-1);
@@ -30,9 +30,11 @@ public class client {
     try { /* get input parameters */
       host = args[0];
       port = Integer.parseInt(args[1]);
-    } catch (IllegalArgumentException e) {
+    } catch (Exception e) {
       System.out.println("USAGE: java client host port");
-      System.exit(-1);
+      //System.exit(-1);
+      host = "localhost";
+      port = 9876;
     }
 
     try {
@@ -45,9 +47,9 @@ public class client {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
         SSLContext ctx = SSLContext.getInstance("TLSv1.2");
         // keystore password (storepass)
-        ks.load(new FileInputStream("client/clientkeystore"), password);
+        ks.load(new FileInputStream("clientkeystore"), password);
         // truststore password (storepass);
-        ts.load(new FileInputStream("client/clienttruststore"), password);
+        ts.load(new FileInputStream("clienttruststore"), password);
         kmf.init(ks, password); // user password (keypass)
         tmf.init(ts); // keystore can be used as truststore here
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

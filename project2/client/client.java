@@ -1,4 +1,4 @@
-package client;
+//package client;
 
 import java.math.BigInteger;
 import java.io.*;
@@ -26,7 +26,7 @@ public class client {
     if (args.length < 2) {
       System.out.println("USAGE: java client host port");
       System.exit(-1);
-    }
+    }*/
     try { /* get input parameters */
       host = args[0];
       port = Integer.parseInt(args[1]);

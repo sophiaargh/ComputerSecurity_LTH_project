@@ -7,9 +7,9 @@ public class Doctor extends User {
 
     public Doctor (String name, int id, Division division){
         super(name, id, division);
-        perms.add(Permissions.perm.READ);
-        perms.add(Permissions.perm.WRITE);
-        perms.add(Permissions.perm.EXECUTE);
+        perms.add(Permissions.READ);
+        perms.add(Permissions.WRITE);
+        perms.add(Permissions.CREATE);
 
     }
     

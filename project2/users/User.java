@@ -9,7 +9,7 @@ public class User{
     private Division division;
     private Object type;
 
-    protected Set<Permissions.perm> perms;
+    protected Set<Permissions> perms;
 
 
     public User(String name, int id, Division divison){

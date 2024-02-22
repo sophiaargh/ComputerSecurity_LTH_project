@@ -7,8 +7,8 @@ public class Nurse extends User {
 
     public Nurse(String name, int id, Division division){
         super(name, id, division);
-        perms.add(Permissions.perm.READ);
-        perms.add(Permissions.perm.WRITE);
+        perms.add(Permissions.READ);
+        perms.add(Permissions.WRITE);
     }
 
 }

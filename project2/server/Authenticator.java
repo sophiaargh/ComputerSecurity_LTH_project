@@ -21,24 +21,26 @@ public class Authenticator {
      */
     public static User authenticateUser(BufferedReader in, PrintWriter out) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
         UserFileReader userFileReader = new UserFileReader("server/users.txt");
-
         System.out.println("Logging in process");
 
+
+        //Prompt client with to write username and get results
         out.println("Username: ");
         out.flush();
-
         String username = in.readLine();
+
         System.out.println("Client provided username: " + username);
 
+        //Prompt client to write password and get results
         out.println("Password: ");
         out.flush();
-
         String password = in.readLine();
+
         System.out.println("Client provided password: " + password);
 
         if (!userFileReader.userExists(username)) {
+            System.out.println("Provided username doesn't exist");
             return null;
         }
 
@@ -47,6 +49,9 @@ public class Authenticator {
         String hashedPassword = bytesToHex(encodedhash);
         String correctHash = userFileReader.getPassword(username);
 
+        System.out.println("Client provided password: " + password);
+        System.out.println("Clients hashed password: " + hashedPassword);
+        System.out.println("Correct hashed password: " + correctHash);
 
         if (hashedPassword.equals(correctHash)) {
             return createUserInstance(userFileReader, username);
@@ -57,14 +62,16 @@ public class Authenticator {
 
     private static User createUserInstance(UserFileReader userFileReader, String username) {
         int id = userFileReader.getId(username);
+        String name = userFileReader.getName(username);
 
         Division division = new Division(userFileReader.getDivision(username));
 
         return
             switch (userFileReader.getRole(username)) {
-                case "doctor" -> new Doctor(username, id, division);
-                case "nurse" -> new Nurse(username, id, division);
-                case "patient" -> new Patient(username, id, division);
+                case "doctor" -> new Doctor(name, id, division);
+                case "nurse" -> new Nurse(name, id, division);
+                case "patient" -> new Patient(name, id, division);
+                case "govagency" -> new GovAgency(name, id, division);
                 default -> {
                     System.out.println("Unknown role");
                     yield null;

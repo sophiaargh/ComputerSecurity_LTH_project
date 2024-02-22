@@ -83,8 +83,15 @@ public class client {
       PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
       BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       String msg;
+
+
+      login(read, in, out);
+      //Start by sending empty message
       for (;;) {
+        System.out.println(in.readLine());
+        //System.out.println("received '" + in.readLine() + "' from server\n");
         System.out.print(">");
+
         msg = read.readLine();
         if (msg.equalsIgnoreCase("quit")) {
           break;
@@ -93,7 +100,7 @@ public class client {
         out.println(msg);
         out.flush();
         System.out.println("done");
-        System.out.println("received '" + in.readLine() + "' from server\n");
+
       }
       in.close();
       out.close();
@@ -102,5 +109,20 @@ public class client {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+
+  private static void login(BufferedReader read, BufferedReader in, PrintWriter out) throws IOException {
+    //Get username prompt and send client answer
+    System.out.println(in.readLine());
+    out.println(read.readLine());
+    out.flush();
+
+    //Get password prompt and send client anser
+    System.out.println(in.readLine());
+    out.println(read.readLine());
+    out.flush();
+
+    System.out.println(in.readLine());
   }
 }

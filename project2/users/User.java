@@ -1,5 +1,6 @@
 package users;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class User{
@@ -13,6 +14,8 @@ public class User{
 
 
     public User(String name, int id, Division divison){
+        this.perms = new HashSet<>();
+
         this.name = name;
         this.id = id;
         this.division = divison;

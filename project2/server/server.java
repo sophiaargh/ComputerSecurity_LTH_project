@@ -1,5 +1,8 @@
 package server;
 
+import users.Division;
+import users.User;
+
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
@@ -10,6 +13,8 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
+
+import static server.Authenticator.authenticateUser;
 
 public class server implements Runnable {
   private ServerSocket serverSocket = null;
@@ -41,27 +46,21 @@ public class server implements Runnable {
       out = new PrintWriter(socket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+      User user = Authenticator.authenticateUser(in, out);
+      if (user != null) {
+        System.out.println("Login successful");
+        new HospitalSystem().run(user, in, out);
 
 
-      String clientMsg = null;
-      //authenticateUser(in, out);
-
-      while ((clientMsg = in.readLine()) != null) {
-        String rev = new StringBuilder(clientMsg).reverse().toString();
-        System.out.println("received '" + clientMsg + "' from client");
-        System.out.print("sending '" + rev + "' to client...");
-
-
-        byte[] encodedhash = digest.digest(clientMsg.getBytes(StandardCharsets.UTF_8));
-        String hashedMsg = bytesToHex(encodedhash);
-
-        out.println(rev);
-        out.println(hashedMsg);
-        System.out.println("Hashed message: '" + hashedMsg + "'");
+      } else {
+        System.out.println("Login failed");
+        out.println("credentials not ok");
         out.flush();
-        System.out.println("done\n");
-      }
+
+      };
+
+
       in.close();
       out.close();
       socket.close();
@@ -73,20 +72,12 @@ public class server implements Runnable {
       e.printStackTrace();
       return;
     } catch (Exception e) {
-      System.out.println("Something went wrong");
+      System.out.println("Something went wrong: " + e.getMessage());
       return;
     }
   }
 
-  private void authenticateUser(BufferedReader in, PrintWriter out) throws IOException {
-    out.println("Username: ");
-    String username = in.readLine();
 
-    if (username.equals("lars")) {
-      out.println("right username");
-    }
-
-  }
 
 
 
@@ -139,15 +130,5 @@ public class server implements Runnable {
     return null;
   }
 
-  private static String bytesToHex(byte[] hash) {
-    StringBuilder hexString = new StringBuilder(2 * hash.length);
-    for (int i = 0; i < hash.length; i++) {
-      String hex = Integer.toHexString(0xff & hash[i]);
-      if(hex.length() == 1) {
-        hexString.append('0');
-      }
-      hexString.append(hex);
-    }
-    return hexString.toString();
-  }
+
 }

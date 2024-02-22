@@ -1,20 +1,18 @@
 package server;
 
-import users.Division;
-import users.User;
+
+import server.users.User;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import javax.net.*;
 import javax.net.ssl.*;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.MessageDigest;
 
-import static server.Authenticator.authenticateUser;
+
 
 public class server implements Runnable {
   private ServerSocket serverSocket = null;
@@ -113,9 +111,12 @@ public class server implements Runnable {
         KeyStore ts = KeyStore.getInstance("JKS");
         char[] password = "password".toCharArray();
         // keystore password (storepass)
-        ks.load(new FileInputStream("server/serverkeystore"), password);
+        InputStream ksInputStream = server.class.getResourceAsStream("/serverkeystore");
+        InputStream tsInputStream = server.class.getResourceAsStream("/servertruststore");
+
+        ks.load(ksInputStream, password);
         // truststore password (storepass)
-        ts.load(new FileInputStream("server/servertruststore"), password);
+        ts.load(tsInputStream, password);
         kmf.init(ks, password); // certificate password (keypass)
         tmf.init(ts);  // possible to use keystore as truststore here
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

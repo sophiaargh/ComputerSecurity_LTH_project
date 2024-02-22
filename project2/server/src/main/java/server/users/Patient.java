@@ -1,5 +1,6 @@
-package users;
-import util.MedicalRecord;
+package server.users;
+
+import server.util.MedicalRecord;
 
 import java.util.ArrayList;
 import java.util.List;

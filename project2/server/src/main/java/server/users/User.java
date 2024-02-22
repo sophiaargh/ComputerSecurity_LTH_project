@@ -1,4 +1,4 @@
-package users;
+package server.users;
 
 import java.util.HashSet;
 import java.util.Set;

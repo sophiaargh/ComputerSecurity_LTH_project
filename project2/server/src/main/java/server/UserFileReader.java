@@ -1,8 +1,6 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +14,9 @@ public class UserFileReader {
 
 
     public UserFileReader(String path) throws IOException {
-        reader = new BufferedReader(new FileReader(path));
+        InputStream inputStream = UserFileReader.class.getResourceAsStream(path);
+
+        reader = new BufferedReader(new InputStreamReader(inputStream));
 
         String line;
         while ((line = reader.readLine()) != null) {

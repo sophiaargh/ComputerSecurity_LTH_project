@@ -1,4 +1,4 @@
-package users;
+package server.users;
 
 import java.util.List;
 import java.util.Set;

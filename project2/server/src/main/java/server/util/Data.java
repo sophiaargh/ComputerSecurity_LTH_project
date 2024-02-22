@@ -1,4 +1,4 @@
-package util;
+package server.util;
 
 public class Data {
     private String data;

@@ -1,6 +1,7 @@
 package server;
 
-import users.User;
+
+import server.users.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;

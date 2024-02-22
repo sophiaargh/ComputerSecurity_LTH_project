@@ -1,6 +1,7 @@
 package server;
 
-import users.*;
+
+import server.users.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class Authenticator {
      */
     public static User authenticateUser(BufferedReader in, PrintWriter out) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        UserFileReader userFileReader = new UserFileReader("server/users.txt");
+        UserFileReader userFileReader = new UserFileReader("/users.txt");
         System.out.println("Logging in process");
 
 
@@ -72,11 +73,10 @@ public class Authenticator {
                 case "nurse" -> new Nurse(name, id, division);
                 case "patient" -> new Patient(name, id, division);
                 case "govagency" -> new GovAgency(name, id, division);
-                default -> {
-                    System.out.println("Unknown role");
-                    yield null;
-                }
+                default -> null;
         };
+
+        //System.out.println("Unknown role");
     }
 
     private static String bytesToHex(byte[] hash) {

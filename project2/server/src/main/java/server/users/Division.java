@@ -1,4 +1,4 @@
-package users;
+package server.users;
 
 public class Division {
     private String division;

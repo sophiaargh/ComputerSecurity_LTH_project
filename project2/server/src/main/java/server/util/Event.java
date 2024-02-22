@@ -1,8 +1,9 @@
-package util;
+package server.util;
+
+import server.users.User;
 
 import java.security.Permission;
 
-import users.User;
 
 public class Event {
     private Permission action;

@@ -1,6 +1,6 @@
-package users;
+package server.users;
 
-import util.MedicalRecord;
+import server.util.MedicalRecord;
 
 public class GovAgency extends User {
 

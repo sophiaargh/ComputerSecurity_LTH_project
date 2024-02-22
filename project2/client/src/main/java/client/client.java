@@ -1,4 +1,4 @@
-//package client;
+package client;
 
 import java.math.BigInteger;
 import java.io.*;
@@ -47,9 +47,13 @@ public class client {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
         SSLContext ctx = SSLContext.getInstance("TLSv1.2");
         // keystore password (storepass)
-        ks.load(new FileInputStream("clientkeystore"), password);
+
+        InputStream ksInputStream = client.class.getResourceAsStream("/0/keystore");
+        InputStream tsInputStream = client.class.getResourceAsStream("/0/truststore");
+
+        ks.load(ksInputStream, password);
         // truststore password (storepass);
-        ts.load(new FileInputStream("clienttruststore"), password);
+        ts.load(tsInputStream, password);
         kmf.init(ks, password); // user password (keypass)
         tmf.init(ts); // keystore can be used as truststore here
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

@@ -1,13 +1,11 @@
 package client;
 
 import java.math.BigInteger;
-import java.net.*;
 import java.io.*;
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
 import java.security.KeyStore;
 import java.security.cert.*;
-import java.sql.SQLOutput;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -47,9 +45,9 @@ public class client {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
         SSLContext ctx = SSLContext.getInstance("TLSv1.2");
         // keystore password (storepass)
-        ks.load(new FileInputStream("clientkeystore"), password);  
+        ks.load(new FileInputStream("client/clientkeystore"), password);
         // truststore password (storepass);
-        ts.load(new FileInputStream("clienttruststore"), password); 
+        ts.load(new FileInputStream("client/clienttruststore"), password);
         kmf.init(ks, password); // user password (keypass)
         tmf.init(ts); // keystore can be used as truststore here
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

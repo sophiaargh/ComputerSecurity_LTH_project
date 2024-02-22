@@ -5,9 +5,11 @@ import java.math.BigInteger;
 import java.net.*;
 import javax.net.*;
 import javax.net.ssl.*;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.MessageDigest;
 
 public class server implements Runnable {
   private ServerSocket serverSocket = null;
@@ -39,12 +41,24 @@ public class server implements Runnable {
       out = new PrintWriter(socket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+
       String clientMsg = null;
+      //authenticateUser(in, out);
+
       while ((clientMsg = in.readLine()) != null) {
         String rev = new StringBuilder(clientMsg).reverse().toString();
         System.out.println("received '" + clientMsg + "' from client");
         System.out.print("sending '" + rev + "' to client...");
+
+
+        byte[] encodedhash = digest.digest(clientMsg.getBytes(StandardCharsets.UTF_8));
+        String hashedMsg = bytesToHex(encodedhash);
+
         out.println(rev);
+        out.println(hashedMsg);
+        System.out.println("Hashed message: '" + hashedMsg + "'");
         out.flush();
         System.out.println("done\n");
       }
@@ -58,9 +72,24 @@ public class server implements Runnable {
       System.out.println("Client died: " + e.getMessage());
       e.printStackTrace();
       return;
+    } catch (Exception e) {
+      System.out.println("Something went wrong");
+      return;
     }
   }
-  
+
+  private void authenticateUser(BufferedReader in, PrintWriter out) throws IOException {
+    out.println("Username: ");
+    String username = in.readLine();
+
+    if (username.equals("lars")) {
+      out.println("right username");
+    }
+
+  }
+
+
+
   private void newListener() { (new Thread(this)).start(); } // calls run()
   public static void main(String args[]) {
     System.out.println("\nServer Started\n");
@@ -108,5 +137,17 @@ public class server implements Runnable {
       return ServerSocketFactory.getDefault();
     }
     return null;
+  }
+
+  private static String bytesToHex(byte[] hash) {
+    StringBuilder hexString = new StringBuilder(2 * hash.length);
+    for (int i = 0; i < hash.length; i++) {
+      String hex = Integer.toHexString(0xff & hash[i]);
+      if(hex.length() == 1) {
+        hexString.append('0');
+      }
+      hexString.append(hex);
+    }
+    return hexString.toString();
   }
 }

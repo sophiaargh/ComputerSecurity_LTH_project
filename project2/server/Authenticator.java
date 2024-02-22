@@ -42,9 +42,11 @@ public class Authenticator {
             return null;
         }
 
-        byte[] encodedhash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+        //hash password with username as salt
+        byte[] encodedhash = digest.digest((password + username).getBytes(StandardCharsets.UTF_8));
         String hashedPassword = bytesToHex(encodedhash);
         String correctHash = userFileReader.getPassword(username);
+
 
         if (hashedPassword.equals(correctHash)) {
             return createUserInstance(userFileReader, username);

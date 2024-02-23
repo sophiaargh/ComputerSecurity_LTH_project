@@ -66,7 +66,6 @@ public class Authenticator {
         String name = userFileReader.getName(username);
 
         Division division = new Division(userFileReader.getDivision(username));
-
         return
             switch (userFileReader.getRole(username)) {
                 case "doctor" -> new Doctor(name, id, division);
@@ -77,6 +76,7 @@ public class Authenticator {
         };
 
         //System.out.println("Unknown role");
+
     }
 
     private static String bytesToHex(byte[] hash) {

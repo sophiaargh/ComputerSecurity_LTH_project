@@ -11,4 +11,7 @@ public class Nurse extends User {
         perms.add(Permissions.WRITE);
     }
 
+    public String getRole(){
+        return "Nurse";
+    }
 }

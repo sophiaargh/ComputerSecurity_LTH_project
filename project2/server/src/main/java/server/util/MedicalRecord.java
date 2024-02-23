@@ -52,4 +52,10 @@ public class MedicalRecord {
         return patient;
     }
 
+    public void createRecord(){
+        System.out.println("TODO create the record (action for a doctor)");
+    }
+    public void deleteRecord(){
+        System.out.println("TODO delete the record (gov agency)");
+    }
 }

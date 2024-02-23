@@ -12,5 +12,8 @@ public class Doctor extends User {
         perms.add(Permissions.CREATE);
 
     }
+    public String getRole(){
+        return "Doctor";
+    }
     
 }

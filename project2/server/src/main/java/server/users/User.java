@@ -3,7 +3,7 @@ package server.users;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User{
+public abstract class User{
 
     private String name; 
     private int id;
@@ -34,4 +34,5 @@ public class User{
         return division;
     }
 
+    public abstract String getRole();
 }

@@ -15,5 +15,7 @@ public class GovAgency extends User {
 
         medRec = null;
     }
-
+    public String getRole(){
+        return "Government Agency";
+    }
 }

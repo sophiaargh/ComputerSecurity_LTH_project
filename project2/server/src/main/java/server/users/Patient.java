@@ -19,6 +19,9 @@ public class Patient extends User{
         medicalRecords.add(medRec);
     }
 
+    public String getRole(){
+        return "Patient";
+    }
 
     
 }

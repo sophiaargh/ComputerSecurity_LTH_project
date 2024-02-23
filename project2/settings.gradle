@@ -1,0 +1,2 @@
+rootProject.name = 'Project 2' // The name of the project
+include 'client', 'server' // Subprojects to include

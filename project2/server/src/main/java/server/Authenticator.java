@@ -3,9 +3,7 @@ package server;
 
 import server.users.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,29 +12,26 @@ public class Authenticator {
 
     /**
      * Tries to log in the user
-     * @param in
-     * @param out
+     * @param comms
      * @return Null if login failed. User instance if login successful
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public static User authenticateUser(BufferedReader in, PrintWriter out) throws IOException, NoSuchAlgorithmException {
+    public static User authenticateUser(CommunicationsBroadcaster comms) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         UserFileReader userFileReader = new UserFileReader("/users.txt");
         System.out.println("Logging in process");
 
 
         //Prompt client with to write username and get results
-        out.println("Username: ");
-        out.flush();
-        String username = in.readLine();
+        comms.sendLine("Username: ");
+        String username = comms.awaitClient();
 
         System.out.println("Client provided username: " + username);
 
         //Prompt client to write password and get results
-        out.println("Password: ");
-        out.flush();
-        String password = in.readLine();
+        comms.sendLine("Password: ");
+        String password = comms.awaitClient();
 
         System.out.println("Client provided password: " + password);
 

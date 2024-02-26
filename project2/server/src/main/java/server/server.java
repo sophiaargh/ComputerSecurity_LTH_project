@@ -39,29 +39,23 @@ public class server implements Runnable {
       System.out.println("serial number " + serialNumber);
       System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
-      PrintWriter out = null;
-      BufferedReader in = null;
-      out = new PrintWriter(socket.getOutputStream(), true);
-      in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+      CommunicationsBroadcaster comms = new CommunicationsBroadcaster(socket);
 
 
-      User user = Authenticator.authenticateUser(in, out);
+
+      User user = Authenticator.authenticateUser(comms);
       if (user != null) {
         System.out.println("Login successful");
-        new HospitalSystem().run(user, in, out);
-
+        new HospitalSystem().run(user, comms);
 
       } else {
         System.out.println("Login failed");
-        out.println("credentials not ok");
-        out.flush();
+        comms.sendLine("Login failed");
 
-      };
+      }
 
-
-      in.close();
-      out.close();
-      socket.close();
+      comms.close();
       numConnectedClients--;
       System.out.println("client disconnected");
       System.out.println(numConnectedClients + " concurrent connection(s)\n");

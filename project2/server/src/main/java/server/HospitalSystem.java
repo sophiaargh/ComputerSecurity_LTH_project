@@ -3,6 +3,7 @@ package server;
 
 import server.users.Doctor;
 import server.users.Patient;
+import server.users.Permissions;
 import server.users.User;
 
 import java.io.BufferedReader;
@@ -31,12 +32,26 @@ public class HospitalSystem {
         String action = in.readLine();
         System.out.println("Client provided action: " + action);
         String quit = "q";
-        if(action.equals(quit)){
-            out.println("quitting"); 
-        } else{
-            int nAction = Integer.parseInt(action); //transforming the string to int
-            out.println("your action: "+ nAction);
+        Permissions pAction = Permissions.NONE;
+        switch (action) {
+            case "q" -> out.println("quitting");
+
+            //TODO: quit
+            case "1" -> pAction = Permissions.READ;
+            case "2" -> pAction = Permissions.WRITE;
+            case "3" -> pAction = Permissions.CREATE;
+            case "4" -> pAction = Permissions.DELETE;
+            default -> out.println(action + " is not a valid action");
         }
+        out.flush();
+        if (user.getPerms().contains(pAction)){
+            out.println("Excecuting "+ pAction);
+        }else{
+            out.println("You are not authorized to do that");
+        }
+
+
+        out.flush();
 
     }
     public void run(User user, BufferedReader in, PrintWriter out) throws IOException {

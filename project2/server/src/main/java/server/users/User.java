@@ -33,6 +33,7 @@ public abstract class User{
     public Division getDiv(){
         return division;
     }
+    public Set<Permissions> getPerms(){return perms;}
 
     public abstract String getRole();
 }

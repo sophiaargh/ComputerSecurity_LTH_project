@@ -1,10 +1,9 @@
 package server;
 
 
-import server.users.Doctor;
-import server.users.Patient;
-import server.users.Permissions;
-import server.users.User;
+import server.users.*;
+import server.util.Data;
+import server.util.MedicalRecord;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +28,7 @@ public class HospitalSystem {
         out.flush();
     }
     public void action(User user, BufferedReader in, PrintWriter out) throws IOException {
+        int id = 0;
         String action = in.readLine();
         System.out.println("Client provided action: " + action);
         String quit = "q";
@@ -46,8 +46,43 @@ public class HospitalSystem {
         out.flush();
         if (user.getPerms().contains(pAction)){
             out.println("Excecuting "+ pAction);
+            out.flush();
+            System.out.println("Excecuting "+ pAction);
+            switch (pAction) {
+                case READ -> {
+                    //TODO: display the records associated with the patient or division or everything (if govagency)
+                    out.println("ID of the record you want to read: ");
+                    out.flush();
+                    id = Integer.parseInt(in.readLine());
+                    System.out.println("Client provided id of record to read: " + id);
+                    MedicalRecord MR = null; //TODO: find medical record using its id
+                    //MR.display()
+                    //eventLogger.log()
+                }
+
+                case WRITE -> {
+                    writeInRecord(in, out, user);
+                    //eventLogger.log()
+                }
+
+                case CREATE -> {
+                    createRecord(in, out, (Doctor) user);
+                    //eventLogger.log()
+                }
+                case DELETE -> {
+                    out.println("ID of the record you want to delete: ");
+                    //TODO: display all the files
+                    out.flush();
+                    id = Integer.parseInt(in.readLine());
+                    System.out.println("Client provided id of record to delete: " + id);
+                    //medicalRecordChosen.delete()
+                    //eventLogger.log()
+                }
+
+            }
         }else{
             out.println("You are not authorized to do that");
+            return;
         }
 
 
@@ -76,5 +111,51 @@ public class HospitalSystem {
             System.out.println("done\n");
         }
     }
+    public void createRecord(BufferedReader in, PrintWriter out, Doctor user) throws IOException {
+        out.println("ID of the record you want to create: ");
+        out.flush();
+        int id = Integer.parseInt(in.readLine());
+        System.out.println("Client provided id of record to create: " + id);
+        out.println("ID of the patient for whom to create the record: ");
+        out.flush();
+        int pID = Integer.parseInt(in.readLine());
+        System.out.println("Client provided id of patient associated with the file: " + pID);
+        Patient patient = null; //TODO: find patient using its id
+        //if the doctor is not in the same division as the patient, abort (we assume that the doctor is treating that patient)
+        if (patient.getDiv() != user.getDiv()){
+            out.println("You are not authorized to create a record for this patient");
+            return;
+        }
+        out.println("ID of the nurse you want to associate the record with");
+        out.flush();
+        int nID = Integer.parseInt(in.readLine());
+        System.out.println("Client provided id of nurse associated with the file " + nID);
+        Nurse nurse = null; //TODO find nurse using its id
+        out.println("Data you want to input: ");
+        out.flush();
+        Data data = new Data(in.readLine());
+        System.out.println("Client provided data to write in the file " + data);
+        MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, data);
+        patient.addMedicalRec(MR);
+    }
+
+    public void writeInRecord(BufferedReader in, PrintWriter out, User user) throws IOException {
+        //TODO: display records associated with the nurse or doctor
+        out.println("ID of the record you want to write in: ");
+        out.flush();
+        int id = Integer.parseInt(in.readLine());
+        System.out.println("Client provided id of record to write in: " + id);
+        MedicalRecord MR = null; //TODO: find the medical record associated with the id
+        out.println("Title: ");
+        out.flush();
+        String dataTitle = in.readLine();
+        System.out.println("Client provided data title: " + dataTitle);
+        out.println("Data: ");
+        out.flush();
+        Data data = new Data(in.readLine());
+        System.out.println("Client provided data: " + data);
+        MR.updateData(data, dataTitle);
+    }
+
 
 }

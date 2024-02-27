@@ -42,7 +42,6 @@ public abstract class User{
         }
         User otherUser = (User) obj;
         return id == otherUser.id &&
-                name.equals(otherUser.name) &&
                 perms.equals(otherUser.perms);
     }
 }

@@ -5,6 +5,7 @@ import server.users.*;
 import server.util.Data;
 import server.util.MedicalRecord;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class HospitalSystem {
         switch (action) {
             case "q" -> {
                 comms.sendLine("quitting");
+                System.out.println("Client is quitting");
                 return -1;
             }
             case "1" -> pAction = Permissions.READ;
@@ -68,27 +70,28 @@ public class HospitalSystem {
                         action(user,comms);
                         return 0;
                     }
-                    //MR.display()
-                    //eventLogger.log()
+                    //TODO: MR.display()
+                    //TODO: log()
                 }
 
                 case WRITE -> {
                     writeInRecord(comms, user);
-                    //eventLogger.log()
+                    //TODO: log()
                 }
 
                 case CREATE -> {
                     createRecord(comms, (Doctor) user);
-                    //eventLogger.log()
+                    //TODO: log
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
-                    //TODO: display all the files
+                    //TODO: display all the medical records
 
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
-                    //medicalRecordChosen.delete()
-                    //eventLogger.log()
+                    database.removeRecord(id);
+
+                    //TODO: log
                 }
 
             }
@@ -101,16 +104,16 @@ public class HospitalSystem {
         return 0;
     }
     public void run(User user, CommunicationsBroadcaster comms) throws IOException {
+        if(!user.getRole().equals("Government Agency")) user = database.transform(user.getId());
 
         comms.sendLine("Successfully logged in!");
         comms.sendLine("id: " + user.getId());
         comms.sendLine("Name: " + user.getName());
         comms.sendLine("Role: " + user.getRole());
         if (user instanceof MedicalEmployee){
-            comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv());
+            comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv().display());
         }
-
-
+        comms.sendLine("To continue, press Enter");
 
         String clientMsg = null;
         while ((clientMsg = comms.awaitClient()) != null) {
@@ -125,6 +128,7 @@ public class HospitalSystem {
             comms.sendLine(rev);
 
             System.out.println("done\n");
+            comms.sendLine("To continue, press Enter");
         }
     }
     public void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
@@ -140,7 +144,7 @@ public class HospitalSystem {
         System.out.println("Client provided id of record to create: " + id);
 
         List<Patient> dPatients = user.getPatients();
-        comms.sendLine("Patients you are treating: ");
+        comms.sendLine("Patient(s) you are treating: ");
         for (Patient patient : dPatients) comms.sendLine(patient.display());
         comms.sendLine("ID of the patient for whom to create the record: ");
         int pID = Integer.parseInt(comms.awaitClient());
@@ -149,8 +153,6 @@ public class HospitalSystem {
         Patient patient = database.getPatients().get(pID);
         if (patient == null){
             comms.sendLine("Not a valid ID number");
-            /*displayAction(user,comms);
-            action(user,comms);*/
             return;
         }
 
@@ -159,9 +161,13 @@ public class HospitalSystem {
             return;
         }
 
-        comms.sendLine("Nurses in your division: ");
+        comms.sendLine("Nurse(s) in your division: ");
         Map<Integer, Nurse> nurses = database.getNurses();
-        for (Nurse nurse: nurses.values()) if (nurse.getDiv() == user.getDiv()) nurse.display();
+
+        for (Nurse nurse: nurses.values())
+            if (nurse.getDiv().display().equals(user.getDiv().display()))
+                comms.sendLine(nurse.display());
+
 
         comms.sendLine("ID of the nurse you want to associate the record with");
         int nID = Integer.parseInt(comms.awaitClient());
@@ -169,8 +175,6 @@ public class HospitalSystem {
         Nurse nurse = database.getNurses().get(nID);
         if (nurse == null){
             comms.sendLine("Not a valid ID number");
-            /*displayAction(user,comms);
-            action(user,comms);*/
             return;
         }
         comms.sendLine("Data you want to input: ");
@@ -178,7 +182,9 @@ public class HospitalSystem {
         Data data = new Data(comms.awaitClient());
         System.out.println("Client provided data to write in the file " + data);
         MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, user.getDiv(), data);
-
+        database.addRecord(MR);
+        comms.sendLine("Medical Record created successfully");
+        //TODO display medical record
     }
 
     public void writeInRecord(CommunicationsBroadcaster comms, User user) throws IOException {
@@ -189,25 +195,27 @@ public class HospitalSystem {
         MedicalRecord MR = database.getMedicalRecords().get(id);
         if (MR == null){
             comms.sendLine("Not a valid ID number");
-            /*displayAction(user,comms);
-            action(user,comms);*/
             return;
         }
-        if (MR.getDoc().getId() != user.getId() && MR.getNurse().getId() != user.getId()){
+        if (MR.getDoc().getId() != user.getId() && user.getRole().equals("Doctor")
+                    || user.getRole().equals("Nurse") && MR.getNurse().getId() != user.getId()){
             comms.sendLine("You are not authorized to write in this record");
-            //LOG?
+            //TODO: log?
             writeInRecord(comms, user);
             return;
         }
-        comms.sendLine("Title: ");
 
+        comms.sendLine("Title: ");
         String dataTitle = comms.awaitClient();
         System.out.println("Client provided data title: " + dataTitle);
         comms.sendLine("Data: ");
 
         Data data = new Data(comms.awaitClient());
         System.out.println("Client provided data: " + data);
-        MR.updateData(data, dataTitle);
+        MR = MR.updateData(data, dataTitle);
+        database.updateRecord(MR);
+        comms.sendLine("Record updated successfully");
+
     }
 
 

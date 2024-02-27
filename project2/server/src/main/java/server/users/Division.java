@@ -5,4 +5,7 @@ public class Division {
     public Division(String division){
         this.division = division;
     }
+    public String display(){
+        return division;
+    }
 }

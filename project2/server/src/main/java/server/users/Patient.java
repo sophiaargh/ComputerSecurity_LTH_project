@@ -16,6 +16,6 @@ public class Patient extends User{
     public String getRole(){
         return "Patient";
     }
-    public String display(){ return (name + " " + id);}
+    public String display(){ return (name + ", id: " + id);}
     
 }

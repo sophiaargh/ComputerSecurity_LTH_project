@@ -33,8 +33,9 @@ public class MedicalRecord {
 
 
 
-    public void updateData(Data data, String dataTitle){
+    public MedicalRecord updateData(Data data, String dataTitle){
         this.data.put(dataTitle, data);
+        return this;
     }
 
     public void newEvent(Event event){
@@ -45,9 +46,6 @@ public class MedicalRecord {
         return patient;
     }
 
-    public void deleteRecord(){
-        System.out.println("TODO delete the record (gov agency)");
-    }
     public Nurse getNurse(){return nurse;}
     public Doctor getDoc(){return doc;}
     public int getID(){return id;}

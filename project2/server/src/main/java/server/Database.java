@@ -1,12 +1,10 @@
 package server;
 
-import server.users.Division;
-import server.users.Doctor;
-import server.users.Nurse;
-import server.users.Patient;
+import server.users.*;
 import server.util.Data;
 import server.util.MedicalRecord;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Database {
@@ -16,6 +14,10 @@ public class Database {
     private Map<Integer, MedicalRecord> medicalRecords;
 
     public Database(){
+        patients = new HashMap<>();
+        doctors = new HashMap<>();
+        nurses = new HashMap<>();
+        medicalRecords = new HashMap<>();
         init();
     }
     private void init(){
@@ -54,5 +56,18 @@ public class Database {
     }
     public void addRecord(MedicalRecord MR){
         medicalRecords.put(MR.getID(),MR);
+    }
+    public void removeRecord(int id){
+        medicalRecords.remove(id);
+    }
+    public void updateRecord(MedicalRecord MR){
+        medicalRecords.replace(MR.getID(), MR);
+    }
+    public User transform(int id){
+        User user = null;
+        if(doctors.containsKey(id)) return doctors.get(id);
+        if(nurses.containsKey(id)) return nurses.get(id);
+        if(patients.containsKey(id)) return patients.get(id);
+        return user;
     }
 }

@@ -18,14 +18,28 @@ public class CommunicationsListener {
 
 
     /**
-     * Will continiously listen to server messages until server send #END#
+     *
      * @throws IOException
      */
-    public void listen() throws IOException {
+
+    /**
+     * Will continiously listen to server messages until server send #END#
+     * @return Returns false if server has sent #QUIT#, signaling that the client should close the connection. Otherwise true
+     * @throws IOException
+     */
+    public boolean listen() throws IOException {
         String msg;
         while (!(msg = in.readLine()).equals("#END#")) {
+            if (msg.equals("#QUIT#")) {
+                return false;
+            }
+
             System.out.println(msg);
+
+
         }
+
+        return true;
     }
 
     /**

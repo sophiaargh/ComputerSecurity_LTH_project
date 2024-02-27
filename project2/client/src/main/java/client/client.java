@@ -65,9 +65,7 @@ public class client {
       String msg;
       login(read, comms);
       //Start by sending empty message
-      for (;;) {
-
-        comms.listen();
+      while (comms.listen()) {
         //System.out.println("received '" + in.readLine() + "' from server\n");
         System.out.print(">");
 
@@ -82,6 +80,8 @@ public class client {
       }
       comms.close();
       read.close();
+
+      System.out.println("Connection closed.");
     } catch (Exception e) {
       e.printStackTrace();
     }

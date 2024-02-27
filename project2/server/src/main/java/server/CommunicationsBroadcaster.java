@@ -38,10 +38,11 @@ public class CommunicationsBroadcaster {
     }
 
     /**
-     * Closes connection
+     * Closes connection and broadcasts #QUIT# to client
      * @throws IOException
      */
     public void close() throws IOException {
+        sendLine("#QUIT#");
         in.close();
         out.close();
         socket.close();

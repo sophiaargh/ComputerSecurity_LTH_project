@@ -31,4 +31,18 @@ public abstract class User{
     public Set<Permissions> getPerms(){return perms;}
 
     public abstract String getRole();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof User)) {
+            return false;
+        }
+        User otherUser = (User) obj;
+        return id == otherUser.id &&
+                name.equals(otherUser.name) &&
+                perms.equals(otherUser.perms);
+    }
 }

@@ -5,8 +5,8 @@ import java.util.Set;
 
 public abstract class User{
 
-    private String name; 
-    private int id;
+    protected String name;
+    protected int id;
     private Object type;
 
     protected Set<Permissions> perms;

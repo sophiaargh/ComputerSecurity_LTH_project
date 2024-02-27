@@ -1,8 +1,5 @@
 package server.util;
-import server.users.Doctor;
-import server.users.Nurse;
-import server.users.Patient;
-import server.users.User;
+import server.users.*;
 
 import java.security.Permission;
 import java.util.ArrayList;
@@ -20,13 +17,15 @@ public class MedicalRecord {
     private int id;
     private Doctor doc;
     private Nurse nurse;
+    private Division division;
 
 
-    public MedicalRecord(int id, Patient patient, Doctor doctor, Nurse nurse, Data data){
+    public MedicalRecord(int id, Patient patient, Doctor doctor, Nurse nurse, Division division, Data data){
         this.id = id;
         this.patient = patient;
         this.doc = doctor;
         this.nurse = nurse;
+        this.division = division;
         this.data = new HashMap<>();
         this.data.put("First Entry:", data);
         log = new ArrayList<>();
@@ -51,4 +50,5 @@ public class MedicalRecord {
     }
     public Nurse getNurse(){return nurse;}
     public Doctor getDoc(){return doc;}
+    public int getID(){return id;}
 }

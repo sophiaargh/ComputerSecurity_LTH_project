@@ -51,7 +51,7 @@ public class server implements Runnable {
 
       } else {
         System.out.println("Login failed");
-        comms.sendLine("Login failed");
+        comms.sendLine("Two-factor authentication failed");
 
       }
 

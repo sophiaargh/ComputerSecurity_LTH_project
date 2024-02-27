@@ -43,6 +43,14 @@ public class Authenticator {
             return null;
         }
 
+        //Check certificate is correct for this user
+        BigInteger serialNumber = ((X509Certificate) certificate).getSerialNumber();
+        BigInteger correctSerialNumber = userFileReader.getSerial(username);
+        if (!serialNumber.equals(correctSerialNumber)) {
+            System.out.println("Serial number from provided certificate does not correspond to correct one.");
+            return null;
+        }
+
         //hash password with username as salt
         byte[] encodedhash = digest.digest((password + username).getBytes(StandardCharsets.UTF_8));
         String hashedPassword = bytesToHex(encodedhash);
@@ -53,15 +61,8 @@ public class Authenticator {
         System.out.println("Correct hashed password: " + correctHash);
 
         if (!hashedPassword.equals(correctHash)) {
+            System.out.println("Invalid password from cleint");
             return null;
-        }
-
-        //Check certificate is correct for this user
-        BigInteger serialNumber = ((X509Certificate) certificate).getSerialNumber();
-        BigInteger correctSerialNumber = userFileReader.getSerial(username);
-        if (!serialNumber.equals(correctSerialNumber)) {
-            return null;
-
         }
 
         return createUserInstance(userFileReader, username);

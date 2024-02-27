@@ -22,7 +22,7 @@ public class Authenticator {
      */
     public static User authenticateUser(Certificate certificate, CommunicationsBroadcaster comms) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        UserFileReader userFileReader = new UserFileReader("/users.txt");
+        UserFileReader userFileReader = new UserFileReader("/users.conf");
         System.out.println("Logging in process");
 
 

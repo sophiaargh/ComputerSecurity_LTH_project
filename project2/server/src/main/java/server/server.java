@@ -43,7 +43,8 @@ public class server implements Runnable {
       CommunicationsBroadcaster comms = new CommunicationsBroadcaster(socket);
 
 
-
+      comms.sendLine("Successfully established secure connection to server!");
+      comms.sendLine("Please login to access system...");
       User user = Authenticator.authenticateUser(cert[0], comms);
       if (user != null) {
         System.out.println("Login successful");

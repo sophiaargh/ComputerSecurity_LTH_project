@@ -3,6 +3,7 @@ package server;
 
 import server.users.*;
 import server.util.Data;
+import server.util.Event;
 import server.util.MedicalRecord;
 
 import javax.sound.midi.Soundbank;
@@ -13,8 +14,10 @@ import java.util.Map;
 
 public class HospitalSystem {
     Database database;
+    Logger eventLogger;
     public HospitalSystem(){
         database = new Database();
+        eventLogger = new Logger();
     }
     /**
      * Displays the possible actions according to the user's role
@@ -71,17 +74,17 @@ public class HospitalSystem {
                         return 0;
                     }
                     //TODO: MR.display()
-                    //TODO: log()
+                    eventLogger.updateLog(new Event(user, "READ", MR.getPatient()));
                 }
 
                 case WRITE -> {
                     writeInRecord(comms, user);
-                    //TODO: log()
+                    eventLogger.updateLog(new Event(user, "WRITE", database.getMedicalRecords().get(id).getPatient()));
                 }
 
                 case CREATE -> {
                     createRecord(comms, (Doctor) user);
-                    //TODO: log
+                    eventLogger.updateLog(new Event(user, "CREATE", database.getMedicalRecords().get(id).getPatient()));
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
@@ -90,8 +93,7 @@ public class HospitalSystem {
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
                     database.removeRecord(id);
-
-                    //TODO: log
+                    eventLogger.updateLog(new Event(user, "DELETE", database.getMedicalRecords().get(id).getPatient()));
                 }
 
             }

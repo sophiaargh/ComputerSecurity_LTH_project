@@ -3,19 +3,34 @@ package server.util;
 import server.users.User;
 
 import java.security.Permission;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class Event {
-    private Permission action;
     private User user;
+    private String action;
+    private User patient;
 
-    public Event (Permission action, User user){
-        this.action = action;
+    public Event (User user, String action){//}, User patient){
         this.user = user;
+        this.action = action;
+        this.patient = null;
     }
 
-    public String getEvent(){
-        return user.getName() +  "did action: " + action.toString() ;
+    public Event (User user, String action, User patient){
+        this.user = user;
+        this.action = action;
+        this.patient = patient;
+    }
+
+    public String toString(){
+        if (patient != null){
+            return ("'" + user.getName() +  "' performed '" + action + "' to record of '" + patient.getName() + "'");
+        } else {
+            return ("'" + user.getName() +  "' performed '" + action);
+        }
     }
 
 }

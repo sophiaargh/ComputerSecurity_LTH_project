@@ -31,8 +31,6 @@ public class MedicalRecord {
         log = new ArrayList<>();
     }
 
-
-
     public MedicalRecord updateData(Data data, String dataTitle){
         this.data.put(dataTitle, data);
         return this;

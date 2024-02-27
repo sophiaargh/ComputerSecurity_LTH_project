@@ -39,7 +39,6 @@ public class server implements Runnable {
       System.out.println("serial number " + serialNumber);
       System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
-
       CommunicationsBroadcaster comms = new CommunicationsBroadcaster(socket);
 
 

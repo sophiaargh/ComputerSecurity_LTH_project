@@ -29,28 +29,30 @@ public class HospitalSystem {
         int id = 0;
         String action = comms.awaitClient();
         System.out.println("Client provided action: " + action);
-        String quit = "q";
         Permissions pAction = Permissions.NONE;
         switch (action) {
-            case "q" -> comms.sendLine("quitting");
-
-            //TODO: quit
+            case "q" -> {
+                //TODO: doesn't quit gracefully
+                comms.sendLine("quitting");
+                comms.close();
+                return;
+            }
             case "1" -> pAction = Permissions.READ;
             case "2" -> pAction = Permissions.WRITE;
             case "3" -> pAction = Permissions.CREATE;
             case "4" -> pAction = Permissions.DELETE;
-            default -> comms.sendLine(action + " is not a valid action");
+            default -> {
+                comms.sendLine(action + " is not a valid action");
+                displayAction(user,comms);
+                action(user,comms);
+            }
         }
 
         if (user.getPerms().contains(pAction)){
-            //out.println("Excecuting "+ pAction);
-            //out.flush();
             System.out.println("Excecuting "+ pAction);
             switch (pAction) {
                 case READ -> {
-                    //TODO: display the records associated with the patient or division or everything (if govagency)
-                    comms.sendLine("ID of the record you want to read: ");
-
+                    //TODO: display all the records according to permission
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to read: " + id);
                     MedicalRecord MR = null; //TODO: find medical record using its id
@@ -80,7 +82,8 @@ public class HospitalSystem {
             }
         }else{
             comms.sendLine("You are not authorized to do that");
-            return;
+            displayAction(user,comms);
+            action(user,comms);
         }
 
 
@@ -119,7 +122,8 @@ public class HospitalSystem {
         //if the doctor is not in the same division as the patient, abort (we assume that the doctor is treating that patient)
         if (patient.getDiv() != user.getDiv()){
             comms.sendLine("You are not authorized to create a record for this patient");
-            return;
+            //LOG?
+            createRecord(comms, user); //where to come back? maybe to display actions?
         }
         comms.sendLine("ID of the nurse you want to associate the record with");
 
@@ -141,6 +145,11 @@ public class HospitalSystem {
         int id = Integer.parseInt(comms.awaitClient());
         System.out.println("Client provided id of record to write in: " + id);
         MedicalRecord MR = null; //TODO: find the medical record associated with the id
+        if (MR.getDoc().getId() != user.getId() && MR.getNurse().getId() != user.getId()){
+            comms.sendLine("You are not authorized to write in this record");
+            //LOG?
+            writeInRecord(comms, user);
+        }
         comms.sendLine("Title: ");
 
         String dataTitle = comms.awaitClient();

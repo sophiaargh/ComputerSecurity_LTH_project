@@ -49,4 +49,6 @@ public class MedicalRecord {
     public void deleteRecord(){
         System.out.println("TODO delete the record (gov agency)");
     }
+    public Nurse getNurse(){return nurse;}
+    public Doctor getDoc(){return doc;}
 }

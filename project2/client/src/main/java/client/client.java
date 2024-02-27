@@ -22,11 +22,7 @@ public class client {
     int port = -1;
     for (int i = 0; i < args.length; i++) {
       System.out.println("args[" + i + "] = " + args[i]);
-    }/*
-    if (args.length < 2) {
-      System.out.println("USAGE: java client host port");
-      System.exit(-1);
-    }*/
+    }
     try { /* get input parameters */
       host = args[0];
       port = Integer.parseInt(args[1]);
@@ -38,46 +34,34 @@ public class client {
     }
 
     try {
-      SSLSocket socket = openConnection(host, port, "lars", "password");
-      System.out.println("\nsocket before handshake:\n" + socket + "\n");
-
-      /*
-       * send http request
-       *
-       * See SSLSocketClient.java for more information about why
-       * there is a forced handshake here when using PrintWriters.
-       */
-      socket.startHandshake();
-      SSLSession session = socket.getSession();
-      Certificate[] cert = session.getPeerCertificates();
-      String subject = ((X509Certificate) cert[0]).getSubjectX500Principal().getName();
-      String issuer = ((X509Certificate) cert[0]).getIssuerX500Principal().getName();
-      BigInteger serialNumber = ((X509Certificate) cert[0]).getSerialNumber();
-      System.out.println("certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
-      System.out.println("issuer:\n" + issuer + "\n");
-      System.out.println("serial number " + serialNumber);
-      System.out.println("socket after handshake:\n" + socket + "\n");
-      System.out.println("secure connection established\n\n");
-
-      CommunicationsListener comms = new CommunicationsListener(socket);
       BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 
-      String msg;
+      System.out.print(">");
+      String id = read.readLine();
+
+      SSLSocket socket = createSocket(read, host, port);
+      openConnection(socket);
+
+      CommunicationsListener comms = new CommunicationsListener(socket);
+
+
       login(read, comms);
+
       //Start by sending empty message
       while (comms.listen()) {
         //System.out.println("received '" + in.readLine() + "' from server\n");
         System.out.print(">");
 
-        msg = read.readLine();
+        String msg = read.readLine();
         if (msg.equalsIgnoreCase("quit")) {
           break;
         }
-        System.out.print("sending '" + msg + "' to server...");
-        comms.sendLine(msg);
-        System.out.println("done");
 
+        comms.sendLine(msg);
       }
+
+      System.out.println("Closing connection...");
+
       comms.close();
       read.close();
 
@@ -87,23 +71,34 @@ public class client {
     }
   }
 
-
   private static void login(BufferedReader read, CommunicationsListener comms) throws IOException {
-    //Get username prompt and send client answer
-    comms.listen();
-    System.out.print(">");
-    comms.sendLine(read.readLine());
 
-    //Get password prompt and send client answer
-    comms.listen();
-    System.out.print(">");
-    comms.sendLine(read.readLine());
   }
 
-  private static SSLSocket openConnection(String host, int port, String username, String password) throws IOException {
+
+  private static SSLSocket createSocket(BufferedReader read, String host, int port) throws IOException {
     SSLSocketFactory factory = null;
     try {
-      char[] passwordChars = "password".toCharArray();
+      System.out.println("Opening keychain...");
+      System.out.println("Keystore username:");
+      System.out.print(">");
+      String username = read.readLine();
+
+      KeychainFileReader keychain = new KeychainFileReader("/keychain.conf");
+
+      if (!keychain.userExists(username)) {
+        System.out.println("Keychain user doesn't exist");
+        return null;
+      }
+
+      String id = keychain.getId(username);
+
+
+      System.out.println("Keystore password:");
+      System.out.print(">");
+      String password = read.readLine();
+      char[] passwordChars = password.toCharArray();
+
       KeyStore ks = KeyStore.getInstance("JKS");
       KeyStore ts = KeyStore.getInstance("JKS");
       KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
@@ -111,8 +106,10 @@ public class client {
       SSLContext ctx = SSLContext.getInstance("TLSv1.2");
       // keystore password (storepass)
 
-      InputStream ksInputStream = client.class.getResourceAsStream("/1/keystore");
-      InputStream tsInputStream = client.class.getResourceAsStream("/1/truststore");
+      InputStream ksInputStream = client.class.getResourceAsStream("/" + id + "/keystore");
+      InputStream tsInputStream = client.class.getResourceAsStream("/" + id + "/truststore");
+
+
 
       ks.load(ksInputStream, passwordChars);
       // truststore password (storepass);
@@ -125,7 +122,32 @@ public class client {
       throw new IOException(e.getMessage());
     }
 
+    SSLSocket socket = (SSLSocket)factory.createSocket(host, port);
+    System.out.println("\nsocket before handshake:\n" + socket + "\n");
+    return socket;
+  }
 
-    return (SSLSocket)factory.createSocket(host, port);
+  private static void openKeychain() throws IOException {
+
+  }
+
+  private static void openConnection(SSLSocket socket) throws IOException {
+    /*
+     * send http request
+     *
+     * See SSLSocketClient.java for more information about why
+     * there is a forced handshake here when using PrintWriters.
+     */
+    socket.startHandshake();
+    SSLSession session = socket.getSession();
+    Certificate[] cert = session.getPeerCertificates();
+    String subject = ((X509Certificate) cert[0]).getSubjectX500Principal().getName();
+    String issuer = ((X509Certificate) cert[0]).getIssuerX500Principal().getName();
+    BigInteger serialNumber = ((X509Certificate) cert[0]).getSerialNumber();
+    System.out.println("certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
+    System.out.println("issuer:\n" + issuer + "\n");
+    System.out.println("serial number " + serialNumber);
+    System.out.println("socket after handshake:\n" + socket + "\n");
+    System.out.println("secure connection established\n\n");
   }
 }

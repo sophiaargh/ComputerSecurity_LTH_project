@@ -38,30 +38,7 @@ public class client {
     }
 
     try {
-      SSLSocketFactory factory = null;
-      try {
-        char[] password = "password".toCharArray();
-        KeyStore ks = KeyStore.getInstance("JKS");
-        KeyStore ts = KeyStore.getInstance("JKS");
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-        SSLContext ctx = SSLContext.getInstance("TLSv1.2");
-        // keystore password (storepass)
-
-        InputStream ksInputStream = client.class.getResourceAsStream("/0/keystore");
-        InputStream tsInputStream = client.class.getResourceAsStream("/0/truststore");
-
-        ks.load(ksInputStream, password);
-        // truststore password (storepass);
-        ts.load(tsInputStream, password);
-        kmf.init(ks, password); // user password (keypass)
-        tmf.init(ts); // keystore can be used as truststore here
-        ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-        factory = ctx.getSocketFactory();
-      } catch (Exception e) {
-        throw new IOException(e.getMessage());
-      }
-      SSLSocket socket = (SSLSocket)factory.createSocket(host, port);
+      SSLSocket socket = openConnection(host, port, "lars", "password");
       System.out.println("\nsocket before handshake:\n" + socket + "\n");
 
       /*
@@ -70,7 +47,6 @@ public class client {
        * See SSLSocketClient.java for more information about why
        * there is a forced handshake here when using PrintWriters.
        */
-
       socket.startHandshake();
       SSLSession session = socket.getSession();
       Certificate[] cert = session.getPeerCertificates();
@@ -83,12 +59,11 @@ public class client {
       System.out.println("socket after handshake:\n" + socket + "\n");
       System.out.println("secure connection established\n\n");
 
-
       CommunicationsListener comms = new CommunicationsListener(socket);
       BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 
       String msg;
-      //login(comms);
+      login(read, comms);
       //Start by sending empty message
       for (;;) {
 
@@ -113,17 +88,44 @@ public class client {
   }
 
 
-  /*private static void login(CommunicationsListener comms) throws IOException {
+  private static void login(BufferedReader read, CommunicationsListener comms) throws IOException {
     //Get username prompt and send client answer
-    System.out.println(in.readLine());
-    out.println(read.readLine());
-    out.flush();
+    comms.listen();
+    System.out.print(">");
+    comms.sendLine(read.readLine());
 
-    //Get password prompt and send client anser
-    System.out.println(in.readLine());
-    out.println(read.readLine());
-    out.flush();
+    //Get password prompt and send client answer
+    comms.listen();
+    System.out.print(">");
+    comms.sendLine(read.readLine());
+  }
 
-    System.out.println(in.readLine());
-  }*/
+  private static SSLSocket openConnection(String host, int port, String username, String password) throws IOException {
+    SSLSocketFactory factory = null;
+    try {
+      char[] passwordChars = "password".toCharArray();
+      KeyStore ks = KeyStore.getInstance("JKS");
+      KeyStore ts = KeyStore.getInstance("JKS");
+      KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+      TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+      SSLContext ctx = SSLContext.getInstance("TLSv1.2");
+      // keystore password (storepass)
+
+      InputStream ksInputStream = client.class.getResourceAsStream("/1/keystore");
+      InputStream tsInputStream = client.class.getResourceAsStream("/1/truststore");
+
+      ks.load(ksInputStream, passwordChars);
+      // truststore password (storepass);
+      ts.load(tsInputStream, passwordChars);
+      kmf.init(ks, passwordChars); // user password (keypass)
+      tmf.init(ts); // keystore can be used as truststore here
+      ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+      factory = ctx.getSocketFactory();
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
+    }
+
+
+    return (SSLSocket)factory.createSocket(host, port);
+  }
 }

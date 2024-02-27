@@ -4,9 +4,12 @@ package server;
 import server.users.*;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 
 public class Authenticator {
 
@@ -17,7 +20,7 @@ public class Authenticator {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public static User authenticateUser(CommunicationsBroadcaster comms) throws IOException, NoSuchAlgorithmException {
+    public static User authenticateUser(Certificate certificate, CommunicationsBroadcaster comms) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         UserFileReader userFileReader = new UserFileReader("/users.txt");
         System.out.println("Logging in process");
@@ -49,11 +52,19 @@ public class Authenticator {
         System.out.println("Clients hashed password: " + hashedPassword);
         System.out.println("Correct hashed password: " + correctHash);
 
-        if (hashedPassword.equals(correctHash)) {
-            return createUserInstance(userFileReader, username);
-        } else {
+        if (!hashedPassword.equals(correctHash)) {
             return null;
         }
+
+        //Check certificate is correct for this user
+        BigInteger serialNumber = ((X509Certificate) certificate).getSerialNumber();
+        BigInteger correctSerialNumber = userFileReader.getSerial(username);
+        if (!serialNumber.equals(correctSerialNumber)) {
+            return null;
+
+        }
+
+        return createUserInstance(userFileReader, username);
     }
 
     private static User createUserInstance(UserFileReader userFileReader, String username) {

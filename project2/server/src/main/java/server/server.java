@@ -44,7 +44,7 @@ public class server implements Runnable {
 
 
 
-      User user = Authenticator.authenticateUser(comms);
+      User user = Authenticator.authenticateUser(cert[0], comms);
       if (user != null) {
         System.out.println("Login successful");
         new HospitalSystem().run(user, comms);

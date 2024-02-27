@@ -7,9 +7,14 @@ import server.util.MedicalRecord;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HospitalSystem {
+    Database database;
+    public HospitalSystem(){
+        database = new Database();
+    }
     /**
      * Displays the possible actions according to the user's role
      * @param user
@@ -34,7 +39,6 @@ public class HospitalSystem {
         Permissions pAction = Permissions.NONE;
         switch (action) {
             case "q" -> {
-                //TODO: doesn't quit gracefully
                 comms.sendLine("quitting");
                 return -1;
             }
@@ -54,9 +58,16 @@ public class HospitalSystem {
             switch (pAction) {
                 case READ -> {
                     //TODO: display all the records according to permission
+                    comms.sendLine("ID of the record you want to read");
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to read: " + id);
-                    MedicalRecord MR = null; //TODO: find medical record using its id
+                    MedicalRecord MR = database.getMedicalRecords().get(id);
+                    if (MR == null){
+                        comms.sendLine("Not a valid ID number");
+                        displayAction(user,comms);
+                        action(user,comms);
+                        return 0;
+                    }
                     //MR.display()
                     //eventLogger.log()
                 }
@@ -85,6 +96,7 @@ public class HospitalSystem {
             comms.sendLine("You are not authorized to do that");
             displayAction(user,comms);
             action(user,comms);
+            return 0;
         }
         return 0;
     }
@@ -116,45 +128,76 @@ public class HospitalSystem {
         }
     }
     public void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
-        comms.sendLine("ID of the record you want to create: ");
+        boolean valid = false;
+        int id = 0;
 
-        int id = Integer.parseInt(comms.awaitClient());
+        while(!valid){
+            comms.sendLine("ID of the record you want to create: ");
+            id = Integer.parseInt(comms.awaitClient());
+            valid = (database.getMedicalRecords().get(id) == null);
+            if (!valid) comms.sendLine("ID already taken");
+        }
         System.out.println("Client provided id of record to create: " + id);
-        comms.sendLine("ID of the patient for whom to create the record: ");
 
+        List<Patient> dPatients = user.getPatients();
+        comms.sendLine("Patients you are treating: ");
+        for (Patient patient : dPatients) comms.sendLine(patient.display());
+        comms.sendLine("ID of the patient for whom to create the record: ");
         int pID = Integer.parseInt(comms.awaitClient());
         System.out.println("Client provided id of patient associated with the file: " + pID);
-        Patient patient = null; //TODO: find patient using its id
-        //if the doctor is not in the same division as the patient, abort (we assume that the doctor is treating that patient)
-        /*if (patient.getDiv() != user.getDiv()){
-            comms.sendLine("You are not authorized to create a record for this patient");
-            //LOG?
-            createRecord(comms, user); //where to come back? maybe to display actions?
-        }*/
-        comms.sendLine("ID of the nurse you want to associate the record with");
 
+        Patient patient = database.getPatients().get(pID);
+        if (patient == null){
+            comms.sendLine("Not a valid ID number");
+            /*displayAction(user,comms);
+            action(user,comms);*/
+            return;
+        }
+
+        if (!dPatients.contains(patient)){
+            comms.sendLine("You are not authorized to create a record for this patient");
+            return;
+        }
+
+        comms.sendLine("Nurses in your division: ");
+        Map<Integer, Nurse> nurses = database.getNurses();
+        for (Nurse nurse: nurses.values()) if (nurse.getDiv() == user.getDiv()) nurse.display();
+
+        comms.sendLine("ID of the nurse you want to associate the record with");
         int nID = Integer.parseInt(comms.awaitClient());
         System.out.println("Client provided id of nurse associated with the file " + nID);
-        Nurse nurse = null; //TODO find nurse using its id
+        Nurse nurse = database.getNurses().get(nID);
+        if (nurse == null){
+            comms.sendLine("Not a valid ID number");
+            /*displayAction(user,comms);
+            action(user,comms);*/
+            return;
+        }
         comms.sendLine("Data you want to input: ");
 
         Data data = new Data(comms.awaitClient());
         System.out.println("Client provided data to write in the file " + data);
-        MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, data);
-        patient.addMedicalRec(MR);
+        MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, user.getDiv(), data);
+
     }
 
     public void writeInRecord(CommunicationsBroadcaster comms, User user) throws IOException {
         //TODO: display records associated with the nurse or doctor
         comms.sendLine("ID of the record you want to write in: ");
-
         int id = Integer.parseInt(comms.awaitClient());
         System.out.println("Client provided id of record to write in: " + id);
-        MedicalRecord MR = null; //TODO: find the medical record associated with the id
+        MedicalRecord MR = database.getMedicalRecords().get(id);
+        if (MR == null){
+            comms.sendLine("Not a valid ID number");
+            /*displayAction(user,comms);
+            action(user,comms);*/
+            return;
+        }
         if (MR.getDoc().getId() != user.getId() && MR.getNurse().getId() != user.getId()){
             comms.sendLine("You are not authorized to write in this record");
             //LOG?
             writeInRecord(comms, user);
+            return;
         }
         comms.sendLine("Title: ");
 

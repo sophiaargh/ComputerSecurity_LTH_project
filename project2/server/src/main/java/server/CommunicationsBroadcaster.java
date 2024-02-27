@@ -10,11 +10,13 @@ public class CommunicationsBroadcaster {
     private final SSLSocket socket;
     private final BufferedReader in;
     private final PrintWriter out;
+    private boolean clientConnected;
 
     public CommunicationsBroadcaster(SSLSocket socket) throws IOException {
         this.socket = socket;
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.clientConnected = true;
     }
 
     /**

@@ -17,6 +17,8 @@ import java.security.cert.*;
  */
 
 public class client {
+  BufferedReader read;
+
   public static void main(String[] args) throws Exception {
     String host = null;
     int port = -1;
@@ -33,26 +35,21 @@ public class client {
       port = 9876;
     }
 
-    try {
-      BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
+    new client().run(host, port);
+  }
 
-      System.out.print(">");
-      String id = read.readLine();
+  public void run(String host, int port) {
+    try {
+      read = new BufferedReader(new InputStreamReader(System.in));
+
 
       SSLSocket socket = createSocket(read, host, port);
       openConnection(socket);
-
       CommunicationsListener comms = new CommunicationsListener(socket);
 
-
-      login(read, comms);
-
-      //Start by sending empty message
+      //Start listening to server
       while (comms.listen()) {
-        //System.out.println("received '" + in.readLine() + "' from server\n");
-        System.out.print(">");
-
-        String msg = read.readLine();
+        String msg = getUserInput();
         if (msg.equalsIgnoreCase("quit")) {
           break;
         }
@@ -71,18 +68,14 @@ public class client {
     }
   }
 
-  private static void login(BufferedReader read, CommunicationsListener comms) throws IOException {
 
-  }
-
-
-  private static SSLSocket createSocket(BufferedReader read, String host, int port) throws IOException {
+  private SSLSocket createSocket(BufferedReader read, String host, int port) throws IOException {
     SSLSocketFactory factory = null;
     try {
+      //FINAL -------------
+      /*
       System.out.println("Opening keychain...");
-      System.out.println("Keystore username:");
-      System.out.print(">");
-      String username = read.readLine();
+      String username = getUserInput("Username:");
 
       KeychainFileReader keychain = new KeychainFileReader("/keychain.conf");
 
@@ -94,10 +87,20 @@ public class client {
       String id = keychain.getId(username);
 
 
-      System.out.println("Keystore password:");
-      System.out.print(">");
-      String password = read.readLine();
+      String password = getUserInput("Password:");
       char[] passwordChars = password.toCharArray();
+*/
+      //--------------------
+      //DEBUG --------------
+
+      char[] passwordChars = "password".toCharArray();
+      String id = getUserInput("Select certificate id:");
+
+
+      //--------------------
+
+
+
 
       KeyStore ks = KeyStore.getInstance("JKS");
       KeyStore ts = KeyStore.getInstance("JKS");
@@ -127,11 +130,8 @@ public class client {
     return socket;
   }
 
-  private static void openKeychain() throws IOException {
 
-  }
-
-  private static void openConnection(SSLSocket socket) throws IOException {
+  private void openConnection(SSLSocket socket) throws IOException {
     /*
      * send http request
      *
@@ -149,5 +149,15 @@ public class client {
     System.out.println("serial number " + serialNumber);
     System.out.println("socket after handshake:\n" + socket + "\n");
     System.out.println("secure connection established\n\n");
+  }
+
+  private String getUserInput(String prompt) throws IOException {
+    System.out.println(prompt);
+    System.out.print(">");
+    return getUserInput();
+  }
+
+  private String getUserInput() throws IOException {
+    return read.readLine();
   }
 }

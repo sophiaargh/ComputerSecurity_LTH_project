@@ -36,8 +36,6 @@ public class client {
     try {
       BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 
-      System.out.print(">");
-      String id = read.readLine();
 
       SSLSocket socket = createSocket(read, host, port);
       openConnection(socket);

@@ -77,8 +77,8 @@ public class Authenticator {
             switch (userFileReader.getRole(username)) {
                 case "doctor" -> new Doctor(name, id, division);
                 case "nurse" -> new Nurse(name, id, division);
-                case "patient" -> new Patient(name, id, division);
-                case "govagency" -> new GovAgency(name, id, division);
+                case "patient" -> new Patient(name, id);
+                case "govagency" -> new GovAgency(name, id);
                 default -> null;
         };
 

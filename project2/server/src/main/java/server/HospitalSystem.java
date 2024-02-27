@@ -6,6 +6,8 @@ import server.util.Data;
 import server.util.MedicalRecord;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HospitalSystem {
     /**
@@ -25,7 +27,7 @@ public class HospitalSystem {
         }
 
     }
-    public void action(User user, CommunicationsBroadcaster comms) throws IOException {
+    public int action(User user, CommunicationsBroadcaster comms) throws IOException {
         int id = 0;
         String action = comms.awaitClient();
         System.out.println("Client provided action: " + action);
@@ -34,8 +36,7 @@ public class HospitalSystem {
             case "q" -> {
                 //TODO: doesn't quit gracefully
                 comms.sendLine("quitting");
-                comms.close();
-                return;
+                return -1;
             }
             case "1" -> pAction = Permissions.READ;
             case "2" -> pAction = Permissions.WRITE;
@@ -85,21 +86,26 @@ public class HospitalSystem {
             displayAction(user,comms);
             action(user,comms);
         }
-
-
+        return 0;
     }
     public void run(User user, CommunicationsBroadcaster comms) throws IOException {
+
         comms.sendLine("Successfully logged in!");
         comms.sendLine("id: " + user.getId());
         comms.sendLine("Name: " + user.getName());
-        comms.sendLine("Division: " + user.getDiv());
         comms.sendLine("Role: " + user.getRole());
+        if (user instanceof MedicalEmployee){
+            comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv());
+        }
 
-        displayAction(user, comms);
-        action(user, comms);
+
 
         String clientMsg = null;
         while ((clientMsg = comms.awaitClient()) != null) {
+            displayAction(user, comms);
+            if (action(user, comms) == -1){
+                return;
+            }
             String rev = new StringBuilder(clientMsg).reverse().toString();
             System.out.println("received '" + clientMsg + "' from client");
             System.out.print("sending '" + rev + "' to client...");
@@ -120,11 +126,11 @@ public class HospitalSystem {
         System.out.println("Client provided id of patient associated with the file: " + pID);
         Patient patient = null; //TODO: find patient using its id
         //if the doctor is not in the same division as the patient, abort (we assume that the doctor is treating that patient)
-        if (patient.getDiv() != user.getDiv()){
+        /*if (patient.getDiv() != user.getDiv()){
             comms.sendLine("You are not authorized to create a record for this patient");
             //LOG?
             createRecord(comms, user); //where to come back? maybe to display actions?
-        }
+        }*/
         comms.sendLine("ID of the nurse you want to associate the record with");
 
         int nID = Integer.parseInt(comms.awaitClient());

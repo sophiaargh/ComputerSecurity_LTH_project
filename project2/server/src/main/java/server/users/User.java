@@ -7,18 +7,16 @@ public abstract class User{
 
     private String name; 
     private int id;
-    private Division division;
     private Object type;
 
     protected Set<Permissions> perms;
 
 
-    public User(String name, int id, Division divison){
+    public User(String name, int id){
         this.perms = new HashSet<>();
 
         this.name = name;
         this.id = id;
-        this.division = divison;
 
     }
 
@@ -30,9 +28,6 @@ public abstract class User{
         return name;
     }
 
-    public Division getDiv(){
-        return division;
-    }
     public Set<Permissions> getPerms(){return perms;}
 
     public abstract String getRole();

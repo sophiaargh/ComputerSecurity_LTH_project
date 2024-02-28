@@ -16,6 +16,7 @@ import java.security.cert.X509Certificate;
 
 public class server implements Runnable {
   private ServerSocket serverSocket = null;
+  private CommunicationsBroadcaster comms;
   private static int numConnectedClients = 0;
   
   public server(ServerSocket ss) throws IOException {
@@ -39,7 +40,7 @@ public class server implements Runnable {
       System.out.println("serial number " + serialNumber);
       System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
-      CommunicationsBroadcaster comms = new CommunicationsBroadcaster(socket);
+      comms = new CommunicationsBroadcaster(socket);
 
 
       comms.sendLine("Successfully established secure connection to server!");
@@ -64,6 +65,15 @@ public class server implements Runnable {
       e.printStackTrace();
       return;
     } catch (Exception e) {
+      try {
+        System.out.print("Informing client that server crashed... ");
+        comms.sendLine("Something went wrong, server crashed");
+        comms.close();
+        System.out.println("");
+      } catch (Exception ee) {
+        System.out.println("Couldn't inform client that server crashed");
+      }
+
       System.out.println("Something went wrong: " + e.getMessage());
       return;
     }

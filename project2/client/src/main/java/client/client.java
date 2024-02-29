@@ -43,7 +43,10 @@ public class client {
       read = new BufferedReader(new InputStreamReader(System.in));
 
 
-      SSLSocket socket = createSocket(read, host, port);
+      SSLSocket socket = null;
+      while (socket == null) {
+        socket = createSocket(read, host, port);
+      }
       openConnection(socket);
       CommunicationsListener comms = new CommunicationsListener(socket);
 
@@ -73,14 +76,16 @@ public class client {
     SSLSocketFactory factory = null;
     try {
       //FINAL -------------
-      /*
+      System.out.println("-------------------------------");
       System.out.println("Opening keychain...");
+      System.out.println("Please provide keychain credentials...");
       String username = getUserInput("Username:");
 
       KeychainFileReader keychain = new KeychainFileReader("/keychain.conf");
 
       if (!keychain.userExists(username)) {
         System.out.println("Keychain user doesn't exist");
+
         return null;
       }
 
@@ -89,14 +94,14 @@ public class client {
 
       String password = getUserInput("Password:");
       char[] passwordChars = password.toCharArray();
-*/
+
       //--------------------
       //DEBUG --------------
-
+/*
       char[] passwordChars = "password".toCharArray();
       String id = getUserInput("Select certificate id:");
 
-
+*/
       //--------------------
 
 
@@ -122,7 +127,9 @@ public class client {
       ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
       factory = ctx.getSocketFactory();
     } catch (Exception e) {
-      throw new IOException(e.getMessage());
+      System.out.println("Error fetching certificate");
+      return null;
+      //throw new IOException(e.getMessage());
     }
 
     SSLSocket socket = (SSLSocket)factory.createSocket(host, port);

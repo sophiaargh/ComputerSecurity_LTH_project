@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public class HospitalSystem {
     Database database;
-    Logger eventLogger;
-    public HospitalSystem(){
-        database = new Database();
-        eventLogger = new Logger();
+    private static final Logger eventLogger = new Logger();
+    public HospitalSystem(Database database){
+        this.database = database;
+
     }
     /**
      * Displays the possible actions according to the user's role
@@ -29,6 +29,7 @@ public class HospitalSystem {
      * @param comms
      */
     public void displayAction(User user, CommunicationsBroadcaster comms){
+        comms.sendLine("-------------------------------");
         comms.sendLine("What do you want to do? ");
         String role = user.getRole();
         comms.sendLine("You are a " + role + " you can:");
@@ -120,8 +121,6 @@ public class HospitalSystem {
         if (user instanceof MedicalEmployee){
             comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv().display());
         }
-        comms.sendLine("To continue, press Enter");
-
 
         do {
             displayAction(user, comms);
@@ -153,14 +152,16 @@ public class HospitalSystem {
     }
     private void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
         boolean valid = false;
-        int id = 0;
+        int id = database.getRecordListSize();
 
-        while(!valid){
+        /*while(!valid){
             comms.sendLine("ID of the record you want to create: ");
             id = Integer.parseInt(comms.awaitClient());
             valid = (database.getMedicalRecords().get(id) == null);
             if (!valid) comms.sendLine("ID already taken");
-        }
+        }*/
+
+
         System.out.println("Client provided id of record to create: " + id);
 
         List<Patient> dPatients = user.getPatients();

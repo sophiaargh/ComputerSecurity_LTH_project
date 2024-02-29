@@ -55,8 +55,13 @@ public class Database {
         return doctors;
     }
     public void addRecord(MedicalRecord MR){
-        medicalRecords.put(MR.getID(),MR);
+        medicalRecords.put(MR.getID(), MR);
     }
+
+    public int getRecordListSize() {
+        return medicalRecords.size();
+    }
+
     public void removeRecord(int id){
         medicalRecords.remove(id);
     }

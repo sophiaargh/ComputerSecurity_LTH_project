@@ -8,4 +8,9 @@ public class Division {
     public String display(){
         return division;
     }
+
+    @Override
+    public String toString() {
+        return division;
+    }
 }

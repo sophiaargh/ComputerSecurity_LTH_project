@@ -17,6 +17,7 @@ import java.security.cert.X509Certificate;
 public class server implements Runnable {
   private ServerSocket serverSocket = null;
   private CommunicationsBroadcaster comms;
+  private static final Database database = new Database();
   private static int numConnectedClients = 0;
   
   public server(ServerSocket ss) throws IOException {
@@ -48,7 +49,7 @@ public class server implements Runnable {
       User user = Authenticator.authenticateUser(cert[0], comms);
       if (user != null) {
         System.out.println("Login successful");
-        new HospitalSystem().run(user, comms);
+        new HospitalSystem(database).run(user, comms);
 
       } else {
         System.out.println("Login failed");

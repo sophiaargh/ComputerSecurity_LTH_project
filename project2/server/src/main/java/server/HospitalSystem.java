@@ -44,7 +44,8 @@ public class HospitalSystem {
         int id = 0;
         String action = comms.awaitClient();
         System.out.println("Client provided action: " + action);
-        Permissions pAction = Permissions.NONE;
+        Permissions pAction;
+
         switch (action) {
             case "q" -> {
                 comms.sendLine("quitting");
@@ -55,11 +56,7 @@ public class HospitalSystem {
             case "2" -> pAction = Permissions.WRITE;
             case "3" -> pAction = Permissions.CREATE;
             case "4" -> pAction = Permissions.DELETE;
-            default -> {
-                comms.sendLine(action + " is not a valid action");
-                displayAction(user,comms);
-                action(user,comms);
-            }
+            default -> pAction = Permissions.NONE;
         }
 
         if (user.getPerms().contains(pAction)){
@@ -85,8 +82,6 @@ public class HospitalSystem {
                     MedicalRecord MR = database.getMedicalRecords().get(id);
                     if (MR == null){
                         comms.sendLine("Not a valid ID number");
-                        displayAction(user,comms);
-                        action(user,comms);
                         return 0;
                     }
                     MR.display(comms);
@@ -115,13 +110,12 @@ public class HospitalSystem {
                     database.removeRecord(id);
                     eventLogger.updateLog(new Event(user, "DELETE", database.getMedicalRecords().get(id).getPatient()));
                 }
-
+                case NONE -> {
+                    comms.sendLine("Invalid action");
+                }
             }
         }else{
             comms.sendLine("You are not authorized to do that");
-            displayAction(user,comms);
-            action(user,comms);
-            return 0;
         }
         return 0;
     }
@@ -137,21 +131,10 @@ public class HospitalSystem {
         }
         comms.sendLine("To continue, press Enter");
 
-        String clientMsg = null;
-        while ((clientMsg = comms.awaitClient()) != null) {
+
+        do {
             displayAction(user, comms);
-            if (action(user, comms) == -1){
-                return;
-            }
-            String rev = new StringBuilder(clientMsg).reverse().toString();
-            System.out.println("received '" + clientMsg + "' from client");
-            System.out.print("sending '" + rev + "' to client...");
-
-            comms.sendLine(rev);
-
-            System.out.println("done\n");
-            comms.sendLine("To continue, press Enter");
-        }
+        } while (action(user, comms) != -1);
     }
     public void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
         boolean valid = false;

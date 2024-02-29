@@ -1,4 +1,5 @@
 package server.util;
+import server.CommunicationsBroadcaster;
 import server.users.*;
 
 import java.security.Permission;
@@ -48,12 +49,12 @@ public class MedicalRecord {
     public Doctor getDoc(){return doc;}
     public int getID(){return id;}
 
-    public void display(){
-        System.out.println("Medical Record: " + Integer.toString(id) + ": owner: " + patient.getName());
-        System.out.println("Division: " + division.toString() + ": Doctor - " + doc.getName() + ": Nurse - " + nurse.getName());
-        System.out.println("Data Log: ");
+    public void display(CommunicationsBroadcaster comms){
+        comms.sendLine("Medical Record: " + Integer.toString(id) + ": owner: " + patient.getName());
+        comms.sendLine("Division: " + division.toString() + ": Doctor - " + doc.getName() + ": Nurse - " + nurse.getName());
+        comms.sendLine("Data Log: ");
         for(Data d: data){
-            System.out.println(d.toString());
+            comms.sendLine(d.getData());
         }
     }
 }

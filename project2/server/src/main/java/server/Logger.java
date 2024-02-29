@@ -15,7 +15,7 @@ public class Logger {
 
     public Logger() {
         try {
-            FileOutputStream fileOutput = new FileOutputStream("project2/server/src/main/resources/logs.txt", true);
+            FileOutputStream fileOutput = new FileOutputStream("server/src/main/resources/logs.txt", true);
             output = new PrintStream(fileOutput);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

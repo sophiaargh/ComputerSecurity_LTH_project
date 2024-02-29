@@ -74,9 +74,9 @@ public class HospitalSystem {
                     List<MedicalRecord> availabMedicalRecords = allMedRecs.stream()
                                                                           .filter(x -> x.getDoc().getId() == user.getId() || x.getNurse().getId() == user.getId() || x.getPatient().getId() == user.getId())
                                                                           .collect(Collectors.toList());
-                    System.out.print("Available Medical records: ");
+                    comms.sendLine("Available Medical records: ");
                     for(MedicalRecord medrec: availabMedicalRecords){
-                        System.out.println("ID: " + medrec.getID() + ": owner: " + medrec.getPatient().getName() );
+                        comms.sendLine("ID: " + medrec.getID() + ": owner: " + medrec.getPatient().getName() );
                     }
                     //TODO: display all the records according to permission
                     comms.sendLine("ID of the record you want to read");
@@ -89,7 +89,7 @@ public class HospitalSystem {
                         action(user,comms);
                         return 0;
                     }
-                    MR.display();
+                    MR.display(comms);
                     eventLogger.updateLog(new Event(user, "READ", MR.getPatient()));
                 }
 

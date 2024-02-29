@@ -61,21 +61,14 @@ public class HospitalSystem {
 
         if (user.getPerms().contains(pAction)){
             System.out.println("Excecuting "+ pAction);
+            List<MedicalRecord> allMedRecs = new ArrayList<>(database.getMedicalRecords().values());
+            List<MedicalRecord> availabMedicalRecords = availabMR(user, allMedRecs);
             switch (pAction) {
                 case READ -> {
-                    Set<Integer> medRecIds = database.getMedicalRecords().keySet();
-                    List<MedicalRecord> allMedRecs = new ArrayList<>();
-                    for(Integer i: medRecIds){
-                        allMedRecs.add(database.getMedicalRecords().get(i));
-                    }
-                    List<MedicalRecord> availabMedicalRecords = allMedRecs.stream()
-                                                                          .filter(x -> x.getDoc().getId() == user.getId() || x.getNurse().getId() == user.getId() || x.getPatient().getId() == user.getId())
-                                                                          .collect(Collectors.toList());
                     comms.sendLine("Available Medical records: ");
                     for(MedicalRecord medrec: availabMedicalRecords){
-                        comms.sendLine("ID: " + medrec.getID() + ": owner: " + medrec.getPatient().getName() );
+                        comms.sendLine("ID: " + medrec.getID() + ": Patient: " + medrec.getPatient().getName() );
                     }
-                    //TODO: display all the records according to permission
                     comms.sendLine("ID of the record you want to read");
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to read: " + id);
@@ -89,7 +82,7 @@ public class HospitalSystem {
                 }
 
                 case WRITE -> {
-                    writeInRecord(comms, user);
+                    writeInRecord(comms, user, availabMedicalRecords);
                     eventLogger.updateLog(new Event(user, "WRITE", database.getMedicalRecords().get(id).getPatient()));
                 }
 
@@ -99,16 +92,14 @@ public class HospitalSystem {
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
-                    Set<Integer> medRecIds = database.getMedicalRecords().keySet();
-                    List<MedicalRecord> allMedRecs = new ArrayList<>();
-                    for(Integer i: medRecIds){
-                        System.out.println("ID: " + allMedRecs.get(i).getID() + ": owner: " + allMedRecs.get(i).getPatient().getName() );
+                    for(MedicalRecord MR: allMedRecs){
+                        comms.sendLine("ID: " + MR.getID() + ": Patient: " + MR.getPatient().getName() );
                     }
 
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
-                    database.removeRecord(id);
                     eventLogger.updateLog(new Event(user, "DELETE", database.getMedicalRecords().get(id).getPatient()));
+                    database.removeRecord(id);
                 }
                 case NONE -> {
                     comms.sendLine("Invalid action");
@@ -136,7 +127,31 @@ public class HospitalSystem {
             displayAction(user, comms);
         } while (action(user, comms) != -1);
     }
-    public void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
+
+    private List<MedicalRecord> availabMR(User user, List<MedicalRecord> allMedRecs){
+        List<MedicalRecord> availabMedicalRecords = null;
+        switch (user.getRole()){
+            case "Patient": {
+                availabMedicalRecords = allMedRecs.stream()
+                        .filter(x -> x.getPatient().getId() == user.getId()).toList();
+                break;
+            }
+            case "Doctor" :
+            case "Nurse": {
+                MedicalEmployee medEmp = (MedicalEmployee) user;
+                availabMedicalRecords = allMedRecs.stream()
+                        .filter(x -> x.getStringDivision().equals(medEmp.getDiv().display())).toList();
+                break;
+            }
+            case "Government Agency":{
+                availabMedicalRecords = allMedRecs;
+            }
+
+        }
+
+        return availabMedicalRecords;
+    }
+    private void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
         boolean valid = false;
         int id = 0;
 
@@ -188,12 +203,16 @@ public class HospitalSystem {
         System.out.println("Client provided data to write in the file " + data);
         MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, user.getDiv(), data);
         database.addRecord(MR);
-        comms.sendLine("Medical Record created successfully");
-        //TODO display medical record
+        comms.sendLine("Medical Record created successfully: ");
+        MR.display(comms);
     }
 
-    public void writeInRecord(CommunicationsBroadcaster comms, User user) throws IOException {
-        //TODO: display records associated with the nurse or doctor
+    private void writeInRecord(CommunicationsBroadcaster comms, User user, List<MedicalRecord> allMedRecs) throws IOException {
+        List<MedicalRecord> availabMedicalRecords = availabMR(user, allMedRecs);
+        comms.sendLine("Available Medical records: ");
+        for(MedicalRecord medrec: availabMedicalRecords){
+            comms.sendLine("ID: " + medrec.getID() + ": Patient: " + medrec.getPatient().getName() );
+        }
         comms.sendLine("ID of the record you want to write in: ");
         int id = Integer.parseInt(comms.awaitClient());
         System.out.println("Client provided id of record to write in: " + id);
@@ -206,13 +225,9 @@ public class HospitalSystem {
                     || user.getRole().equals("Nurse") && MR.getNurse().getId() != user.getId()){
             comms.sendLine("You are not authorized to write in this record");
             //TODO: log?
-            writeInRecord(comms, user);
             return;
         }
 
-        comms.sendLine("Title: ");
-        String dataTitle = comms.awaitClient();
-        System.out.println("Client provided data title: " + dataTitle);
         comms.sendLine("Data: ");
 
         Data data = new Data(comms.awaitClient());

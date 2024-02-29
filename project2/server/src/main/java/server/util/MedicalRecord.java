@@ -48,13 +48,17 @@ public class MedicalRecord {
     public Nurse getNurse(){return nurse;}
     public Doctor getDoc(){return doc;}
     public int getID(){return id;}
+    public String getStringDivision(){return division.display();}
 
     public void display(CommunicationsBroadcaster comms){
-        comms.sendLine("Medical Record: " + Integer.toString(id) + ": owner: " + patient.getName());
+        comms.sendLine("-------------------------------");
+        comms.sendLine("Medical Record: " + id + ": Patient: " + patient.getName());
         comms.sendLine("Division: " + division.toString() + ": Doctor - " + doc.getName() + ": Nurse - " + nurse.getName());
         comms.sendLine("Data Log: ");
         for(Data d: data){
             comms.sendLine(d.getData());
         }
+        comms.sendLine("End of Medical Record");
+        comms.sendLine("-------------------------------");
     }
 }

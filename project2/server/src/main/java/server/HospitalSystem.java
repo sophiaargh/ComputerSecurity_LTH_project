@@ -8,9 +8,13 @@ import server.util.MedicalRecord;
 
 import javax.sound.midi.Soundbank;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class HospitalSystem {
     Database database;
@@ -62,6 +66,18 @@ public class HospitalSystem {
             System.out.println("Excecuting "+ pAction);
             switch (pAction) {
                 case READ -> {
+                    Set<Integer> medRecIds = database.getMedicalRecords().keySet();
+                    List<MedicalRecord> allMedRecs = new ArrayList<>();
+                    for(Integer i: medRecIds){
+                        allMedRecs.add(database.getMedicalRecords().get(i));
+                    }
+                    List<MedicalRecord> availabMedicalRecords = allMedRecs.stream()
+                                                                          .filter(x -> x.getDoc().getId() == user.getId() || x.getNurse().getId() == user.getId() || x.getPatient().getId() == user.getId())
+                                                                          .collect(Collectors.toList());
+                    System.out.print("Available Medical records: ");
+                    for(MedicalRecord medrec: availabMedicalRecords){
+                        System.out.println("ID: " + medrec.getID() + ": owner: " + medrec.getPatient().getName() );
+                    }
                     //TODO: display all the records according to permission
                     comms.sendLine("ID of the record you want to read");
                     id = Integer.parseInt(comms.awaitClient());
@@ -73,7 +89,7 @@ public class HospitalSystem {
                         action(user,comms);
                         return 0;
                     }
-                    //TODO: MR.display()
+                    MR.display();
                     eventLogger.updateLog(new Event(user, "READ", MR.getPatient()));
                 }
 
@@ -88,7 +104,11 @@ public class HospitalSystem {
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
-                    //TODO: display all the medical records
+                    Set<Integer> medRecIds = database.getMedicalRecords().keySet();
+                    List<MedicalRecord> allMedRecs = new ArrayList<>();
+                    for(Integer i: medRecIds){
+                        System.out.println("ID: " + allMedRecs.get(i).getID() + ": owner: " + allMedRecs.get(i).getPatient().getName() );
+                    }
 
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
@@ -214,7 +234,7 @@ public class HospitalSystem {
 
         Data data = new Data(comms.awaitClient());
         System.out.println("Client provided data: " + data);
-        MR = MR.updateData(data, dataTitle);
+        MR = MR.updateData(data);
         database.updateRecord(MR);
         comms.sendLine("Record updated successfully");
 

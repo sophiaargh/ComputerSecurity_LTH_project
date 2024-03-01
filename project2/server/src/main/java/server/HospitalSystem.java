@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public class HospitalSystem {
     Database database;
-    private static final Logger eventLogger = new Logger();
-    public HospitalSystem(Database database){
+    private Logger eventLogger;
+    public HospitalSystem(Database database, Logger eventLogger){
         this.database = database;
-
+        this.eventLogger = eventLogger;
     }
     /**
      * Displays the possible actions according to the user's role
@@ -79,17 +79,17 @@ public class HospitalSystem {
                         return 0;
                     }
                     MR.display(comms);
-                    eventLogger.updateLog(new Event(user, "READ", MR.getPatient()));
+                    eventLogger.updateLog(new Event(user, "READ", true, MR.getPatient()));
                 }
 
                 case WRITE -> {
                     writeInRecord(comms, user, availabMedicalRecords);
-                    eventLogger.updateLog(new Event(user, "WRITE", database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "WRITE", true, database.getMedicalRecords().get(id).getPatient()));
                 }
 
                 case CREATE -> {
                     createRecord(comms, (Doctor) user);
-                    eventLogger.updateLog(new Event(user, "CREATE", database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "CREATE", true, database.getMedicalRecords().get(id).getPatient()));
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
@@ -99,14 +99,16 @@ public class HospitalSystem {
 
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
-                    eventLogger.updateLog(new Event(user, "DELETE", database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "DELETE", true, database.getMedicalRecords().get(id).getPatient()));
                     database.removeRecord(id);
                 }
                 case NONE -> {
                     comms.sendLine("Invalid action");
+                    return 0;
                 }
             }
         }else{
+            eventLogger.updateLog(new Event(user, pAction.name(), false));
             comms.sendLine("You are not authorized to do that");
         }
         return 0;
@@ -179,6 +181,7 @@ public class HospitalSystem {
 
         if (!dPatients.contains(patient)){
             comms.sendLine("You are not authorized to create a record for this patient");
+            eventLogger.updateLog(new Event(user, "CREATE", false, patient));
             return;
         }
 
@@ -225,7 +228,7 @@ public class HospitalSystem {
         if (MR.getDoc().getId() != user.getId() && user.getRole().equals("Doctor")
                     || user.getRole().equals("Nurse") && MR.getNurse().getId() != user.getId()){
             comms.sendLine("You are not authorized to write in this record");
-            //TODO: log?
+            eventLogger.updateLog(new Event(user, "WRITE", false));
             return;
         }
 

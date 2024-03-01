@@ -18,6 +18,7 @@ public class server implements Runnable {
   private ServerSocket serverSocket = null;
   private CommunicationsBroadcaster comms;
   private static final Database database = new Database();
+  private static final Logger eventLogger = new Logger();
   private static int numConnectedClients = 0;
   
   public server(ServerSocket ss) throws IOException {
@@ -46,10 +47,10 @@ public class server implements Runnable {
 
       comms.sendLine("Successfully established secure connection to server!");
       comms.sendLine("Please login to access system...");
-      User user = Authenticator.authenticateUser(cert[0], comms);
+      User user = Authenticator.authenticateUser(cert[0], comms, eventLogger);
       if (user != null) {
         System.out.println("Login successful");
-        new HospitalSystem(database).run(user, comms);
+        new HospitalSystem(database, eventLogger).run(user, comms);
 
       } else {
         System.out.println("Login failed");

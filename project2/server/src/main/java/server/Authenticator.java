@@ -2,6 +2,7 @@ package server;
 
 
 import server.users.*;
+import server.util.Event;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -20,7 +21,7 @@ public class Authenticator {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public static User authenticateUser(Certificate certificate, CommunicationsBroadcaster comms) throws IOException, NoSuchAlgorithmException {
+    public static User authenticateUser(Certificate certificate, CommunicationsBroadcaster comms, Logger eventLogger) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         UserFileReader userFileReader = new UserFileReader("/users.conf");
         System.out.println("Logging in process");
@@ -43,11 +44,14 @@ public class Authenticator {
             return null;
         }
 
+        User userInstance = createUserInstance(userFileReader, username);
+
         //Check certificate is correct for this user
         BigInteger serialNumber = ((X509Certificate) certificate).getSerialNumber();
         BigInteger correctSerialNumber = userFileReader.getSerial(username);
         if (!serialNumber.equals(correctSerialNumber)) {
             System.out.println("Serial number from provided certificate does not correspond to correct one.");
+            eventLogger.updateLog(new Event(userInstance, "Log-in", false));
             return null;
         }
 
@@ -62,9 +66,11 @@ public class Authenticator {
 
         if (!hashedPassword.equals(correctHash)) {
             System.out.println("Invalid password from cleint");
+            eventLogger.updateLog(new Event(userInstance, "Log-in", false));
             return null;
         }
 
+        eventLogger.updateLog(new Event(userInstance, "Log-in", true));
         return createUserInstance(userFileReader, username);
     }
 

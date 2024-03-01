@@ -1,5 +1,13 @@
-2024-02-27 23:28:57 : 'Lars Eriksson' performed 'CREATE' to record of 'Gunilla Persson'
-2024-02-27 23:29:40 : 'Lars Eriksson' performed 'READ' to record of 'Alice Svensson'
-2024-02-27 23:30:36 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'
-2024-02-27 23:30:45 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'
-2024-02-27 23:30:53 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'
+2024-02-27 23:28:57 : 'Lars Eriksson' performed 'CREATE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-02-27 23:29:40 : 'Lars Eriksson' performed 'READ' to record of 'Alice Svensson'. ACCESS: ALLOWED
+2024-02-27 23:30:36 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-02-27 23:30:45 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-02-27 23:30:53 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-03-01 11:39:16 : 'Erika Persson' performed 'READ' to record of 'Alice Svensson'. ACCESS: ALLOWED
+2024-03-01 11:39:59 : 'Erika Persson' performed 'READ' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-03-01 12:18:11 : 'Lars Eriksson' performed 'Log-in'. ACCESS: DENIED
+2024-03-01 13:22:34 : 'Lars Eriksson' performed 'Log-in'. ACCESS: ALLOWED
+2024-03-01 13:22:40 : 'Lars Eriksson' performed 'READ' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-03-01 13:23:04 : 'Lars Eriksson' performed 'WRITE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-03-01 13:23:12 : 'Lars Eriksson' performed 'CREATE' to record of 'Gunilla Persson'. ACCESS: ALLOWED
+2024-03-01 13:23:59 : 'Lars Eriksson' performed 'CREATE' to record of 'Gunilla Persson'. ACCESS: ALLOWED

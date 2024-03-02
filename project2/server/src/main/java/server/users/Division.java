@@ -5,12 +5,12 @@ public class Division {
     public Division(String division){
         this.division = division;
     }
-    public String display(){
-        return division;
-    }
 
     @Override
     public String toString() {
         return division;
+    }
+    public boolean equals(Division div){
+        return this.toString().equals(div.toString());
     }
 }

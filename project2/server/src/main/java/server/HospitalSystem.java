@@ -101,6 +101,7 @@ public class HospitalSystem {
                     System.out.println("Client provided id of record to delete: " + id);
                     eventLogger.updateLog(new Event(user, "DELETE", true, database.getMedicalRecords().get(id).getPatient()));
                     database.removeRecord(id);
+                    comms.sendLine("Record successfully deleted");
                 }
                 case NONE -> {
                     comms.sendLine("Invalid action");
@@ -121,7 +122,7 @@ public class HospitalSystem {
         comms.sendLine("Name: " + user.getName());
         comms.sendLine("Role: " + user.getRole());
         if (user instanceof MedicalEmployee){
-            comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv().display());
+            comms.sendLine("Division: " + ((MedicalEmployee) user).getDiv().toString());
         }
 
         do {
@@ -141,7 +142,7 @@ public class HospitalSystem {
             case "Nurse": {
                 MedicalEmployee medEmp = (MedicalEmployee) user;
                 availabMedicalRecords = allMedRecs.stream()
-                        .filter(x -> x.getStringDivision().equals(medEmp.getDiv().display())).toList();
+                        .filter(x -> x.getDivision().equals(medEmp.getDiv())).toList();
                 break;
             }
             case "Government Agency":{
@@ -189,7 +190,7 @@ public class HospitalSystem {
         Map<Integer, Nurse> nurses = database.getNurses();
 
         for (Nurse nurse: nurses.values())
-            if (nurse.getDiv().display().equals(user.getDiv().display()))
+            if (nurse.getDiv().equals(user.getDiv()))
                 comms.sendLine(nurse.display());
 
 
@@ -205,7 +206,7 @@ public class HospitalSystem {
 
         Data data = new Data(comms.awaitClient());
         System.out.println("Client provided data to write in the file " + data);
-        MedicalRecord MR = new MedicalRecord(id, patient, (Doctor) user, nurse, user.getDiv(), data);
+        MedicalRecord MR = new MedicalRecord(id, patient, user, nurse, user.getDiv(), data);
         database.addRecord(MR);
         comms.sendLine("Medical Record created successfully: ");
         MR.display(comms);

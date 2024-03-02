@@ -13,5 +13,5 @@ public class Nurse extends MedicalEmployee {
     public String getRole(){
         return "Nurse";
     }
-    public String display(){return (name + ", id: " + id + ", division: " + division.display());}
+    public String display(){return (name + ", id: " + id + ", division: " + division.toString());}
 }

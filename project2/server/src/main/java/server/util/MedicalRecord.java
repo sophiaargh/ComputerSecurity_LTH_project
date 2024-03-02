@@ -48,7 +48,8 @@ public class MedicalRecord {
     public Nurse getNurse(){return nurse;}
     public Doctor getDoc(){return doc;}
     public int getID(){return id;}
-    public String getStringDivision(){return division.display();}
+    public String getStringDivision(){return division.toString();}
+    public Division getDivision(){return division;}
 
     public void display(CommunicationsBroadcaster comms){
         comms.sendLine("-------------------------------");

@@ -78,18 +78,27 @@ public class HospitalSystem {
                         comms.sendLine("Not a valid ID number");
                         return 0;
                     }
-                    MR.display(comms);
-                    eventLogger.updateLog(new Event(user, "READ", true, MR.getPatient()));
+                    if (canReadIt(user, MR)){
+                        MR.display(comms);
+                        eventLogger.updateLog(new Event(user, "READ", true, MR.getPatient()));
+                    }else{
+                        comms.sendLine("You are not authorized to read this record");
+                        eventLogger.updateLog(new Event(user, "READ", false, MR.getPatient()));
+                    }
+                    return 0;
+
                 }
 
                 case WRITE -> {
                     writeInRecord(comms, user, availabMedicalRecords);
                     eventLogger.updateLog(new Event(user, "WRITE", true, database.getMedicalRecords().get(id).getPatient()));
+                    return 0;
                 }
 
                 case CREATE -> {
                     createRecord(comms, (Doctor) user);
                     eventLogger.updateLog(new Event(user, "CREATE", true, database.getMedicalRecords().get(id).getPatient()));
+                    return 0;
                 }
                 case DELETE -> {
                     comms.sendLine("ID of the record you want to delete: ");
@@ -102,6 +111,8 @@ public class HospitalSystem {
                     eventLogger.updateLog(new Event(user, "DELETE", true, database.getMedicalRecords().get(id).getPatient()));
                     database.removeRecord(id);
                     comms.sendLine("Record successfully deleted");
+
+                    return 0;
                 }
                 case NONE -> {
                     comms.sendLine("Invalid action");
@@ -153,16 +164,29 @@ public class HospitalSystem {
 
         return availabMedicalRecords;
     }
+    private boolean canReadIt(User user, MedicalRecord MR){
+        switch (user.getRole()){
+            case "Government Agency":
+                return true;
+            case "Doctor":
+            case "Nurse":
+                MedicalEmployee ME = (MedicalEmployee) user;
+                return MR.getDivision().equals(ME.getDiv());
+            case "Patient":
+                return MR.getPatient().equals((Patient) user);
+        }
+        return false;
+    }
     private void createRecord(CommunicationsBroadcaster comms, Doctor user) throws IOException {
         boolean valid = false;
         int id = database.getRecordListSize();
 
-        /*while(!valid){
+        while(!valid){
             comms.sendLine("ID of the record you want to create: ");
             id = Integer.parseInt(comms.awaitClient());
             valid = (database.getMedicalRecords().get(id) == null);
             if (!valid) comms.sendLine("ID already taken");
-        }*/
+        }
 
 
         System.out.println("Client provided id of record to create: " + id);

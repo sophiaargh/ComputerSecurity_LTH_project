@@ -17,5 +17,8 @@ public class Patient extends User{
         return "Patient";
     }
     public String display(){ return (name + ", id: " + id);}
+    public boolean equals(Patient patient){
+        return name.equals(patient.getName()) && id == patient.getId();
+    }
     
 }

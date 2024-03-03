@@ -62,4 +62,9 @@ public class MedicalRecord {
         comms.sendLine("End of Medical Record");
         comms.sendLine("-------------------------------");
     }
+
+    @Override
+    public String toString() {
+        return "Record id: " + id;
+    }
 }

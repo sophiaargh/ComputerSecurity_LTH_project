@@ -80,10 +80,10 @@ public class HospitalSystem {
                     }
                     if (canReadIt(user, MR)){
                         MR.display(comms);
-                        eventLogger.updateLog(new Event(user, "READ", true, MR.getPatient()));
+                        eventLogger.updateLog(new Event(user, "READ", true, MR));
                     }else{
                         comms.sendLine("You are not authorized to read this record");
-                        eventLogger.updateLog(new Event(user, "READ", false, MR.getPatient()));
+                        eventLogger.updateLog(new Event(user, "READ", false, MR));
                     }
                     return 0;
 
@@ -91,13 +91,13 @@ public class HospitalSystem {
 
                 case WRITE -> {
                     writeInRecord(comms, user, availabMedicalRecords);
-                    eventLogger.updateLog(new Event(user, "WRITE", true, database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "WRITE", true, database.getMedicalRecords().get(id)));
                     return 0;
                 }
 
                 case CREATE -> {
                     createRecord(comms, (Doctor) user);
-                    eventLogger.updateLog(new Event(user, "CREATE", true, database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "CREATE", true, database.getMedicalRecords().get(id)));
                     return 0;
                 }
                 case DELETE -> {
@@ -108,7 +108,7 @@ public class HospitalSystem {
 
                     id = Integer.parseInt(comms.awaitClient());
                     System.out.println("Client provided id of record to delete: " + id);
-                    eventLogger.updateLog(new Event(user, "DELETE", true, database.getMedicalRecords().get(id).getPatient()));
+                    eventLogger.updateLog(new Event(user, "DELETE", true, database.getMedicalRecords().get(id)));
                     database.removeRecord(id);
                     comms.sendLine("Record successfully deleted");
 
@@ -206,7 +206,7 @@ public class HospitalSystem {
 
         if (!dPatients.contains(patient)){
             comms.sendLine("You are not authorized to create a record for this patient");
-            eventLogger.updateLog(new Event(user, "CREATE", false, patient));
+            eventLogger.updateLog(new Event(user, "CREATE", false));
             return;
         }
 

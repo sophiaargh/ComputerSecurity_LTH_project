@@ -49,10 +49,12 @@ public class server implements Runnable {
       comms.sendLine("Please login to access system...");
       User user = Authenticator.authenticateUser(cert[0], comms, eventLogger);
       if (user != null) {
+        System.out.println("Two-factor authentication successful");
         System.out.println("Login successful");
         new HospitalSystem(database, eventLogger).run(user, comms);
 
       } else {
+        System.out.println("Two-factor authentication failed");
         System.out.println("Login failed");
         comms.sendLine("Two-factor authentication failed");
 
